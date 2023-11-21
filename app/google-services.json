@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "551885345901",
+    "firebase_url": "https://todoapp-f80f0-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "todoapp-f80f0",
+    "storage_bucket": "todoapp-f80f0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:551885345901:android:41d99a75e383079ebe9b64",
+        "android_client_info": {
+          "package_name": "com.example.studentinformationmanagement"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "551885345901-rohjirbm3dvi7uemmut775n21ea6mob7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEwq5gfLPOvhMKUzxPL72rjMlWd8z1jII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "551885345901-rohjirbm3dvi7uemmut775n21ea6mob7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
