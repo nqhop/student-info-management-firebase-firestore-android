@@ -5,21 +5,26 @@ import androidx.databinding.Bindable;
 
 import com.example.studentinformationmanagement.BR;
 
+import java.util.List;
+
 public class Student extends BaseObservable {
     String name;
     String address;
     String dayOfBirth;
     String classroom;
     String course;
+    List<Certificate> certificateList;
     public Student (){
     }
 
-    public Student(String name, String address, String dayOfBirth, String classroom, String course) {
+    public Student(String name, String address, String dayOfBirth,
+                   String classroom, String course, List<Certificate> certificates) {
         this.name = name;
         this.address = address;
         this.dayOfBirth = dayOfBirth;
         this.classroom = classroom;
         this.course = course;
+        this.certificateList = certificates;
     }
 
     @Bindable
@@ -66,5 +71,13 @@ public class Student extends BaseObservable {
     public void setCourse(String course) {
         this.course = course;
         notifyPropertyChanged(BR.course);
+    }
+
+    public List<Certificate> getCertificateList() {
+        return certificateList;
+    }
+
+    public void setCertificateList(List<Certificate> certificateList) {
+        this.certificateList = certificateList;
     }
 }
