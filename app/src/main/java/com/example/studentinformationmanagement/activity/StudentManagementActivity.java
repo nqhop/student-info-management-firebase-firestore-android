@@ -7,8 +7,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -18,6 +22,8 @@ import com.example.studentinformationmanagement.databinding.ActivityStudentManag
 import com.example.studentinformationmanagement.model.Student;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +32,7 @@ public class StudentManagementActivity extends AppCompatActivity {
 
     private ActivityStudentManagementBinding activityStudentManagementBinding;
     private StudentAdapter studentAdapter;
+    Button btnfilter;
 
     public StudentManagementActivity() {
     }
@@ -36,6 +43,7 @@ public class StudentManagementActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_management);
+        btnfilter = (Button) findViewById(R.id.btnfilter);
 //        getSupportActionBar().show();
 
         activityStudentManagementBinding = DataBindingUtil.setContentView(this, R.layout.activity_student_management);
@@ -48,6 +56,15 @@ public class StudentManagementActivity extends AppCompatActivity {
         activityStudentManagementBinding.studentRecyclerView.setLayoutManager(layoutManager);
         studentAdapter = new StudentAdapter(itemList);
         activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
+
+        activityStudentManagementBinding.btnfilter.setOnClickListener(view -> {
+                final DialogPlus dialogPlus = DialogPlus.newDialog(this)
+                        .setContentHolder(new ViewHolder(R.layout.filter_popup))
+                        .setExpanded(true, 1200)
+                        .setGravity(Gravity.TOP)
+                        .create();
+                dialogPlus.show();
+        });
     }
 
     @Override
