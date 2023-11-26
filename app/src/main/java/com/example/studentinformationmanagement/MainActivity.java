@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.studentinformationmanagement.activity.FormActivity;
+import com.example.studentinformationmanagement.activity.StudentManagementActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,6 +16,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Intent i = new Intent(this, FormActivity.class);
         i.putExtra("id", "");
-        startActivity(i);
+//        startActivity(i);
+
+        Intent studentManagement = new Intent(this, StudentManagementActivity.class);
+        startActivity(studentManagement);
     }
 }
