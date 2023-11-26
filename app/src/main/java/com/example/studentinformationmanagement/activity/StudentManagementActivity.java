@@ -36,8 +36,8 @@ public class StudentManagementActivity extends AppCompatActivity {
 
     public StudentManagementActivity() {
     }
-//    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-//    private CollectionReference collectionReference = db.collection("Students");
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference collectionReference = db.collection("Students");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,12 @@ public class StudentManagementActivity extends AppCompatActivity {
                         .create();
                 dialogPlus.show();
         });
+
+        GetCOurse();
+    }
+
+    private void GetCOurse() {
+
     }
 
     @Override
