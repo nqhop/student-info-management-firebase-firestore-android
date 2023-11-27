@@ -26,6 +26,13 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -113,6 +120,32 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
+    private void saveLoginHistory(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference loginHistoryRef = db.collection("loginHistory").document(userId).collection("events");
+
+        Map<String, Object> loginEvent = new HashMap<>();
+        loginEvent.put("timestamp", FieldValue.serverTimestamp());
+
+        loginHistoryRef.add(loginEvent)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()) {
+                            // Lịch sử đăng nhập được lưu thành công
+                            showToast("Login history saved successfully");
+                        } else {
+                            // Lỗi khi lưu lịch sử đăng nhập
+                            showToast("Error saving login history");
+                        }
+                    }
+                });
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
 
     private void signInWithGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();

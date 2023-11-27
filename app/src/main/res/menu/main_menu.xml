@@ -14,5 +14,7 @@
         android:title="Export"/>
     <item android:id="@+id/myImport"
         android:title="Import"/>
+    <item android:id="@+id/loginHistory"
+        android:title="Login History"/>
 
 </menu>
