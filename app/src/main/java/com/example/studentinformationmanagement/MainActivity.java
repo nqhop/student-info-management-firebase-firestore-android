@@ -22,5 +22,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(studentManagement);
 //         i.putExtra("id", "Nusob5B4cLZaxP1Ju6tJ");
 //         startActivity(i);
+
     }
 }
