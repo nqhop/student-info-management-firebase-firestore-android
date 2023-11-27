@@ -19,9 +19,15 @@ public class Student extends BaseObservable {
     }
 
     public Student(String name, String address, String dayOfBirth, String classroom, String course, String id) {
-    List<Certificate> certificateList;
-    public Student (){
+        this.name = name;
+        this.address = address;
+        this.dayOfBirth = dayOfBirth;
+        this.classroom = classroom;
+        this.course = course;
+        this.id = id;
+        this.mail = id + "@gmail.com";
     }
+    List<Certificate> certificateList;
 
     public Student(String name, String address, String dayOfBirth,
                    String classroom, String course, List<Certificate> certificates) {
