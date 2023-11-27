@@ -32,6 +32,14 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.ForgotPasswordActivity"
+            android:label="Forgot Password"
+            android:parentActivityName=".activity.LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.LoginActivity" />
+        </activity>
 
         <activity
             android:name=".activity.StudentManagementActivity"

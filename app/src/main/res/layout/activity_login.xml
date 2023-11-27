@@ -3,11 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:padding="16dp"
-    tools:context=".activity.LoginActivity">
-
-
+    android:padding="16dp">
 
     <ImageView
         android:id="@+id/imageViewLogo"
@@ -25,8 +21,7 @@
         android:layout_marginTop="16dp"
         android:hint="Email"
         android:inputType="textEmailAddress"
-        android:padding="12dp"
-        app:layout_constraintTop_toBottomOf="@id/imageViewLogo" />
+        android:padding="12dp" />
 
     <EditText
         android:id="@+id/editTextLoginPassword"
@@ -36,8 +31,7 @@
         android:layout_marginTop="8dp"
         android:hint="Password"
         android:inputType="textPassword"
-        android:padding="12dp"
-        app:layout_constraintTop_toBottomOf="@id/editTextLoginEmail" />
+        android:padding="12dp" />
 
     <Button
         android:id="@+id/btnLogin"
@@ -45,8 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/editTextLoginPassword"
         android:layout_marginTop="16dp"
-        android:text="Log In"
-        app:layout_constraintTop_toBottomOf="@id/editTextLoginPassword" />
+        android:text="Log In" />
 
     <TextView
         android:id="@+id/textViewForgotPassword"
@@ -54,10 +47,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/btnLogin"
         android:layout_marginTop="8dp"
+        android:layout_alignParentEnd="true"
         android:clickable="true"
         android:text="Forgot Password?"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintTop_toBottomOf="@id/btnLogin" />
+        android:textColor="@color/colorAccent" />
 
     <Button
         android:id="@+id/btnLoginWithGoogle"
@@ -65,8 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/textViewForgotPassword"
         android:layout_marginTop="16dp"
-        android:text="Log In with Google"
-        app:layout_constraintTop_toBottomOf="@id/textViewForgotPassword" />
+        android:text="Log In with Google" />
 
     <Button
         android:id="@+id/btnGoToSignup"
@@ -75,7 +67,6 @@
         android:layout_below="@id/btnLoginWithGoogle"
         android:layout_marginTop="16dp"
         android:text="Don't have an account? Sign Up"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintTop_toBottomOf="@id/btnLoginWithGoogle" />
+        android:textColor="@color/colorAccent" />
 
 </RelativeLayout>
