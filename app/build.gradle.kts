@@ -56,6 +56,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.orhanobut:dialogplus:1.11@aar")
+    implementation("com.firebaseui:firebase-ui-database:7.1.1")
 
 
 

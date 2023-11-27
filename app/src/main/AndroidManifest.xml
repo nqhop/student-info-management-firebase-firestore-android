@@ -14,6 +14,10 @@
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
         <activity
+            android:name=".activity.StudentManagementActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:exported="false" />
+        <activity
             android:name=".activity.FormActivity"
             android:exported="false" />
         <activity

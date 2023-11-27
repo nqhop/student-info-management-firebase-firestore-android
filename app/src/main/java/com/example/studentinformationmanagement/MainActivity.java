@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.studentinformationmanagement.activity.FormActivity;
+import com.example.studentinformationmanagement.activity.StudentManagementActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,7 +15,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent i = new Intent(this, FormActivity.class);
-        i.putExtra("id", "Nusob5B4cLZaxP1Ju6tJ");
-        startActivity(i);
+        i.putExtra("id", "");
+//        startActivity(i);
+
+        Intent studentManagement = new Intent(this, StudentManagementActivity.class);
+        startActivity(studentManagement);
+//         i.putExtra("id", "Nusob5B4cLZaxP1Ju6tJ");
+//         startActivity(i);
     }
 }

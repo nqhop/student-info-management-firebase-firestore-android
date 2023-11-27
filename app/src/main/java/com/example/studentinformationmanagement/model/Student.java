@@ -13,6 +13,12 @@ public class Student extends BaseObservable {
     String dayOfBirth;
     String classroom;
     String course;
+    String id;
+    String mail;
+    public Student (){
+    }
+
+    public Student(String name, String address, String dayOfBirth, String classroom, String course, String id) {
     List<Certificate> certificateList;
     public Student (){
     }
@@ -24,53 +30,65 @@ public class Student extends BaseObservable {
         this.dayOfBirth = dayOfBirth;
         this.classroom = classroom;
         this.course = course;
+        this.id = id;
+        this.mail = id + "@gmail.com";
         this.certificateList = certificates;
     }
 
-    @Bindable
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-        notifyPropertyChanged(BR.name);
     }
-    @Bindable
+
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
-        notifyPropertyChanged(BR.address);
     }
-    @Bindable
+
     public String getDayOfBirth() {
         return dayOfBirth;
     }
 
     public void setDayOfBirth(String dayOfBirth) {
         this.dayOfBirth = dayOfBirth;
-        notifyPropertyChanged(BR.dayOfBirth);
     }
-    @Bindable
+
     public String getClassroom() {
         return classroom;
     }
 
     public void setClassroom(String classroom) {
         this.classroom = classroom;
-        notifyPropertyChanged(BR.classroom);
     }
-    @Bindable
+
     public String getCourse() {
         return course;
     }
 
     public void setCourse(String course) {
         this.course = course;
-        notifyPropertyChanged(BR.course);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
     public List<Certificate> getCertificateList() {
