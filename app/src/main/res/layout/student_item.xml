@@ -24,7 +24,7 @@
 
 
         <TextView
-            android:id="@+id/studentIdText"
+            android:id="@+id/studentMailText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="519000000"
@@ -33,6 +33,29 @@
             android:textColor="#000"
             android:layout_below="@+id/studentNameText"
             />
+        <TextView
+            android:id="@+id/courseText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Course: "
+            android:layout_marginTop="6dp"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:layout_below="@+id/studentMailText"
+            />
+
+        <TextView
+            android:id="@+id/studentCourseText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/studentMailText"
+            android:layout_marginTop="6dp"
+
+            android:layout_toEndOf="@+id/courseText"
+            android:text="Python advance"
+
+            android:textColor="#000"
+            android:textSize="16sp" />
 
 
     </RelativeLayout>

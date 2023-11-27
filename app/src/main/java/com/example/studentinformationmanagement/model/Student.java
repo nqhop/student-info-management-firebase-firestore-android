@@ -16,14 +16,14 @@ public class Student extends BaseObservable {
     public Student (){
     }
 
-    public Student(String name, String address, String dayOfBirth, String classroom, String course, String id, String mail) {
+    public Student(String name, String address, String dayOfBirth, String classroom, String course, String id) {
         this.name = name;
         this.address = address;
         this.dayOfBirth = dayOfBirth;
         this.classroom = classroom;
         this.course = course;
         this.id = id;
-        this.mail = mail;
+        this.mail = id + "@gmail.com";
     }
 
     public String getName() {

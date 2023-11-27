@@ -12,25 +12,46 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.studentinformationmanagement.R;
+import com.example.studentinformationmanagement.adapter.CourseCustomAdapter;
 import com.example.studentinformationmanagement.adapter.StudentAdapter;
 import com.example.studentinformationmanagement.databinding.ActivityStudentManagementBinding;
+import com.example.studentinformationmanagement.databinding.FilterPopupBinding;
+import com.example.studentinformationmanagement.model.Course;
 import com.example.studentinformationmanagement.model.Student;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.OnClickListener;
+import com.orhanobut.dialogplus.OnItemClickListener;
 import com.orhanobut.dialogplus.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class StudentManagementActivity extends AppCompatActivity {
 
     private ActivityStudentManagementBinding activityStudentManagementBinding;
+    private FilterPopupBinding filterPopupBinding;
+    private ArrayList<String> courses = new ArrayList<>();
+    private List<String> filterCourses = new ArrayList<>();
     private StudentAdapter studentAdapter;
     Button btnfilter;
 
@@ -44,32 +65,155 @@ public class StudentManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_management);
         btnfilter = (Button) findViewById(R.id.btnfilter);
-//        getSupportActionBar().show();
 
         activityStudentManagementBinding = DataBindingUtil.setContentView(this, R.layout.activity_student_management);
+//        filterPopupBinding = DataBindingUtil.setContentView(this, R.layout.filter_popup);
         ArrayList<Student> itemList = new ArrayList<>(
-                Arrays.asList(new Student("Bao", "7 District", "01/01/2001", "192.168.1.11", "Java", "01", "01@gmail.com"),
-                        new Student("Tinh", "4 District", "01/01/2001", "192.168.1.12", "Java", "02", "02@gmail.com")
+                Arrays.asList(new Student("Bao", "7 District", "01/01/2001", "192.168.1.11", "Java", "01"),
+                        new Student("Tinh", "4 District", "01/01/2001", "192.168.1.12", "Java", "02")
                 )
         );
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         activityStudentManagementBinding.studentRecyclerView.setLayoutManager(layoutManager);
-        studentAdapter = new StudentAdapter(itemList);
-        activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
 
-        activityStudentManagementBinding.btnfilter.setOnClickListener(view -> {
-                final DialogPlus dialogPlus = DialogPlus.newDialog(this)
-                        .setContentHolder(new ViewHolder(R.layout.filter_popup))
-                        .setExpanded(true, 1200)
-                        .setGravity(Gravity.TOP)
-                        .create();
-                dialogPlus.show();
-        });
 
-        GetCOurse();
+//        studentAdapter = new StudentAdapter(itemList);
+//        activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
+
+        // handle filter
+        getCourse();
+        popUpAction();
+//        getStudentsWithFilter(null);
     }
 
-    private void GetCOurse() {
+    private void popUpAction() {
+        CourseCustomAdapter adapter;
+        adapter = new CourseCustomAdapter(this, courses);
+
+        activityStudentManagementBinding.btnfilter.setOnClickListener(view -> {
+            final DialogPlus dialogPlus = DialogPlus.newDialog(this)
+                    .setContentHolder(new ViewHolder(R.layout.filter_popup))
+                    .setExpanded(true)
+                    .setGravity(Gravity.TOP)
+                    .setAdapter(adapter)
+//                    .setOnItemClickListener(new OnItemClickListener() {
+//                        @Override
+//                        public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+//                            // Handle list item clicks
+//                            String selectedItem = courses.get(position);
+//                            Toast.makeText(StudentManagementActivity.this, "Selected from DialogPlus: " + selectedItem, Toast.LENGTH_SHORT).show();
+//                            Log.d("course", "Selected");
+//                            dialog.dismiss();
+//                        }
+//                    })
+//                    .setOnClickListener(new OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogPlus dialog, View view) {
+//                            view.findViewById(R.id.btnUpdate).setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    filterCourses.clear();
+//                                    adapter.getSelectedItems().stream().forEach(x -> filterCourses.add(courses.get(x)));
+//                                    getStudentsWithFilter(filterCourses);
+//                                    Toast.makeText(StudentManagementActivity.this, "Updated", Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+//                        }
+//                    })
+                    .create();
+
+            View dialogContentView = dialogPlus.getHolderView();
+            dialogContentView.findViewById(R.id.btnCancel).setOnClickListener(v -> {
+                dialogPlus.dismiss();
+            });
+            dialogContentView.findViewById(R.id.btnUpdate).setOnClickListener(v -> {
+                filterCourses.clear();
+                adapter.getSelectedItems().stream().forEach(x -> filterCourses.add(courses.get(x)));
+                getStudentsWithFilter(filterCourses);
+                Toast.makeText(StudentManagementActivity.this, "Updated", Toast.LENGTH_SHORT).show();
+                dialogPlus.dismiss();
+            });
+
+            // Get ListView from the dialog layout
+            ListView listView = (ListView) dialogPlus.getHolderView().findViewById(R.id.courseList);
+
+            // Set adapter and item click listener
+            listView.setAdapter(adapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedItem = courses.get(position);
+                    String toastText = adapter.checkInSetSelected(position) ? "Unselected" : "Selected";
+
+                    Toast.makeText(StudentManagementActivity.this, toastText + ": " + selectedItem, Toast.LENGTH_SHORT).show();
+                    adapter.toggleItemSelection(position);
+//                    dialogPlus.dismiss();
+                }
+            });
+            dialogPlus.show();
+        });
+    }
+
+    private void getCourse() {
+        CompletableFuture<QuerySnapshot> future = new CompletableFuture<>();
+        collectionReference.get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                QuerySnapshot querySnapshot = task.getResult();
+                future.complete(querySnapshot);
+            }
+            try {
+                QuerySnapshot querySnapshot = future.get();
+                if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                    for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
+                        String documentData = (String) documentSnapshot.getData().get("course");
+                        if(!courses.contains(documentData)){
+                            courses.add(documentData);
+                        }
+                    }
+                }
+                Log.d("getCourse", String.valueOf(courses.size()));
+
+                // init list student
+                List<String> filterValues = new ArrayList<>();
+                courses.forEach(x -> filterValues.add(x));
+                getStudentsWithFilter(filterValues);
+
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private void getStudentsWithFilter(List<String> filterValues){
+
+        if(filterValues.size() == 0){
+            courses.forEach(x -> filterValues.add(x));
+        }
+
+        // Create a query
+        Query query = collectionReference.whereIn("course", filterValues);
+
+        query.get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                ArrayList<Student> filteredData = new ArrayList<>();
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    Map<String, Object> data = document.getData();
+//                    Student(String name, String address, String dayOfBirth, String classroom, String course, String id)
+                    filteredData.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
+                    Log.d("getStudentsWithFilter", document.getData().get("course").toString());
+                    Log.d("getStudentsWithFilter", String.valueOf(filteredData.size()));
+                }
+                // Create and set the adapter for the RecyclerView
+
+                studentAdapter = new StudentAdapter(filteredData);
+                activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
+
+            })
+            .addOnFailureListener(e -> {
+                // Handle query failure
+            });
 
     }
 
