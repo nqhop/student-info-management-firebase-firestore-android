@@ -5,6 +5,8 @@ import androidx.databinding.Bindable;
 
 import com.example.studentinformationmanagement.BR;
 
+import java.util.List;
+
 public class Student extends BaseObservable {
     String name;
     String address;
@@ -17,6 +19,12 @@ public class Student extends BaseObservable {
     }
 
     public Student(String name, String address, String dayOfBirth, String classroom, String course, String id) {
+    List<Certificate> certificateList;
+    public Student (){
+    }
+
+    public Student(String name, String address, String dayOfBirth,
+                   String classroom, String course, List<Certificate> certificates) {
         this.name = name;
         this.address = address;
         this.dayOfBirth = dayOfBirth;
@@ -24,6 +32,7 @@ public class Student extends BaseObservable {
         this.course = course;
         this.id = id;
         this.mail = id + "@gmail.com";
+        this.certificateList = certificates;
     }
 
     public String getName() {
@@ -80,5 +89,13 @@ public class Student extends BaseObservable {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public List<Certificate> getCertificateList() {
+        return certificateList;
+    }
+
+    public void setCertificateList(List<Certificate> certificateList) {
+        this.certificateList = certificateList;
     }
 }

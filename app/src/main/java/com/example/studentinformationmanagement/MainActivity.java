@@ -20,5 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent studentManagement = new Intent(this, StudentManagementActivity.class);
         startActivity(studentManagement);
+//         i.putExtra("id", "Nusob5B4cLZaxP1Ju6tJ");
+//         startActivity(i);
     }
 }

@@ -8,11 +8,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.studentinformationmanagement.R;
 import com.example.studentinformationmanagement.adapter.CertificateAdapter;
 import com.example.studentinformationmanagement.databinding.ActivityFormBinding;
+import com.example.studentinformationmanagement.dialog.CertificateDialog;
+import com.example.studentinformationmanagement.dialog.CertificateDialogListener;
 import com.example.studentinformationmanagement.model.Certificate;
 import com.example.studentinformationmanagement.model.Student;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,26 +29,51 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class FormActivity extends AppCompatActivity {
+public class FormActivity extends AppCompatActivity implements CertificateDialogListener {
     private ActivityFormBinding activityFormBinding;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Students");
     private CertificateAdapter certificateAdapter;
+    private String currentId;
+
+    List<Certificate> certificates;
     Student formStudent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form);
 
+
         formStudent = new Student();
         activityFormBinding = DataBindingUtil.setContentView(this, R.layout.activity_form);
 
         activityFormBinding.addBtn.setOnClickListener(v -> {
+            formStudent.setCertificateList(certificates);
             addStudent(formStudent);
             Toast.makeText(this,  "Complete", Toast.LENGTH_SHORT).show();
         });
 
+        activityFormBinding.deleteBtn.setOnClickListener(v -> {
+            deleteStudent();
+        });
+
+        activityFormBinding.updateButton.setOnClickListener(v -> {
+            updateStudent();
+        });
+
+
+       CertificateDialog dialogFragment = new CertificateDialog(this);
+
+        activityFormBinding.addCert.setOnClickListener(v -> {
+            dialogFragment.show(getSupportFragmentManager(), "loginDialog");
+        });
+
+
+        certificates = new ArrayList<>();
 
         Intent intent = getIntent();
         String id = intent.getStringExtra("id");
@@ -53,24 +81,55 @@ public class FormActivity extends AppCompatActivity {
         assert id != null;
         if(id.isEmpty()) {
             activityFormBinding.setStudent(formStudent);
+            currentId = null;
+            activityFormBinding.deleteBtn.setVisibility(View.INVISIBLE);
         } else {
             getStudent(id);
+            currentId = id;
+            activityFormBinding.addBtn.setVisibility(View.GONE);
+            activityFormBinding.updateButton.setVisibility(View.VISIBLE);
         }
-
-//        Integer id, String title, String description, String date
-
-        ArrayList<Certificate> itemList = new ArrayList<>(
-                Arrays.asList(new Certificate("01", "Title 01", "Desc 01", "01/01/2001"),
-                        new Certificate("02", "Title 02", "Desc 02", "02/01/2001")
-                        )
-        );
-
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         activityFormBinding.recyclerView.setLayoutManager(layoutManager);
 
-        certificateAdapter = new CertificateAdapter(itemList);
+        certificateAdapter = new CertificateAdapter(certificates);
         activityFormBinding.recyclerView.setAdapter(certificateAdapter);
+    }
+
+    public void updateStudent() {
+        Map<String, Object> updatedData = new HashMap<>();
+
+        // Assuming your Student class has getters for its properties
+        updatedData.put("name", formStudent.getName());
+        updatedData.put("address", formStudent.getAddress());
+        updatedData.put("dayOfBirth", formStudent.getDayOfBirth());
+        updatedData.put("classroom", formStudent.getClassroom());
+        updatedData.put("course", formStudent.getCourse());
+        updatedData.put("certificateList", formStudent.getCertificateList());
+
+        collectionReference.document(currentId).update(updatedData)
+                .addOnCompleteListener(task -> {
+                   if(task.isSuccessful()){
+                       Toast.makeText(this, "Update success", Toast.LENGTH_SHORT).show();
+                   } else {
+
+                   }
+                });
+    }
+
+
+    public void deleteStudent() {
+        collectionReference.document(currentId).delete()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Intent i = new Intent(this, FormActivity.class);
+                        i.putExtra("id", "");
+                        startActivity(i);
+                    } else {
+                        // Handle errors
+                    }
+                });
     }
 
     public void addStudent(Student student) {
@@ -91,19 +150,34 @@ public class FormActivity extends AppCompatActivity {
                 .document(collectionId)
                 .get()
                 .addOnCompleteListener(task -> {
+
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            // Convert the document to your data model
-                            Student data = document.toObject(Student.class);
-                            Log.d("Test", "Document data: " + data.toString());
-                            activityFormBinding.setStudent(data);
+                            formStudent = document.toObject(Student.class);
+                            activityFormBinding.setStudent(formStudent);
+
+                            if(!(formStudent.getCertificateList() == null)) {
+                                for(Certificate certificate : formStudent.getCertificateList()){
+                                    certificates.add(certificate);
+                                    certificateAdapter.notifyDataSetChanged();
+                                }
+                            }
+
                         } else {
-                            Log.d("Test", "No such document");
+                            currentId = null;
+                            activityFormBinding.deleteBtn.setVisibility(View.INVISIBLE);
                         }
                     } else {
                         Log.w("Test", "Error getting document", task.getException());
                     }
                 });
+    }
+
+    @Override
+    public void onCertificateAdded(Certificate certificate) {
+        certificates.add(certificate);
+        formStudent.setCertificateList(certificates);
+        certificateAdapter.notifyDataSetChanged();
     }
 }
