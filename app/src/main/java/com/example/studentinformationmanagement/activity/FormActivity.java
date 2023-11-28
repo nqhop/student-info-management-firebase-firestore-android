@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,8 +16,10 @@ import com.example.studentinformationmanagement.R;
 import com.example.studentinformationmanagement.adapter.CertificateAdapter;
 import com.example.studentinformationmanagement.adapter.ItemClickListener;
 import com.example.studentinformationmanagement.databinding.ActivityFormBinding;
+import com.example.studentinformationmanagement.dialog.AddWarningDialog;
 import com.example.studentinformationmanagement.dialog.CertificateDialog;
 import com.example.studentinformationmanagement.dialog.CertificateDialogListener;
+import com.example.studentinformationmanagement.dialog.DeleteWarningDialog;
 import com.example.studentinformationmanagement.model.Certificate;
 import com.example.studentinformationmanagement.model.Student;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -54,13 +57,20 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         activityFormBinding = DataBindingUtil.setContentView(this, R.layout.activity_form);
 
         activityFormBinding.addBtn.setOnClickListener(v -> {
+            if(!formStudent.isValid()) {
+                AddWarningDialog.showAddDialog(this, "Item Name", (dialog, which) -> {
+                });
+                return;
+            }
             formStudent.setCertificateList(certificates);
             addStudent(formStudent);
             Toast.makeText(this,  "Complete", Toast.LENGTH_SHORT).show();
         });
 
         activityFormBinding.deleteBtn.setOnClickListener(v -> {
-            deleteStudent();
+            DeleteWarningDialog.showDeleteDialog(this, "Item Name", (dialog, which) -> {
+                deleteStudent();
+            });
         });
 
         activityFormBinding.updateButton.setOnClickListener(v -> {
@@ -126,8 +136,7 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         collectionReference.document(currentId).delete()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Intent i = new Intent(this, FormActivity.class);
-                        i.putExtra("id", "");
+                        Intent i = new Intent(this, StudentManagementActivity.class);
                         startActivity(i);
                     } else {
                         // Handle errors
@@ -140,11 +149,14 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
                 .addOnSuccessListener(documentReference -> {
                     // Data added successfully
                     Log.d("Firestore", "DocumentSnapshot added with ID: " + documentReference.getId());
+                    Intent i = new Intent(this, StudentManagementActivity.class);
+                    startActivity(i);
                 })
                 .addOnFailureListener(e -> {
                     // Handle errors
                     Log.w("Firestore", "Error adding document", e);
                 });
+
     }
 
 

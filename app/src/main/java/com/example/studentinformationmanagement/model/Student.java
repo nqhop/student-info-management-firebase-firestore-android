@@ -5,7 +5,11 @@ import androidx.databinding.Bindable;
 
 import com.example.studentinformationmanagement.BR;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class Student extends BaseObservable {
     String name;
@@ -100,5 +104,32 @@ public class Student extends BaseObservable {
 
     public void setCertificateList(List<Certificate> certificateList) {
         this.certificateList = certificateList;
+    }
+
+    public boolean isValid() {
+        return isStringNotEmpty(name)
+                && isStringNotEmpty(id)
+                && isStringNotEmpty(email)
+                && isStringNotEmpty(address)
+                && isStringNotEmpty(dayOfBirth)
+                && isValidDateFormat(dayOfBirth)
+                && isStringNotEmpty(classroom)
+                && isStringNotEmpty(course);
+    }
+
+    private boolean isStringNotEmpty(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private boolean isValidDateFormat(String date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+        sdf.setLenient(false);
+
+        try {
+            Date parsedDate = sdf.parse(date);
+            return parsedDate != null;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 }

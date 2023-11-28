@@ -76,7 +76,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(v.getContext(), FormActivity.class);
-                    i.putExtra("id", "");
+                    i.putExtra("id", "BgtsaIFxMyJkcKLjM8LP");
                     v.getContext().startActivity(i);
 
                 }
