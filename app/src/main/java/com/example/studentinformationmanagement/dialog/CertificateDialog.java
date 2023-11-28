@@ -26,11 +26,21 @@ import java.util.ArrayList;
 public class CertificateDialog extends DialogFragment {
     View dialogView;
 
+    Certificate certificate;
+    boolean isUpdated = false;
+    int position;
+
 
     private CertificateDialogListener listener;
 
-    public CertificateDialog( CertificateDialogListener certificateDialogListener) {
-        listener = certificateDialogListener;
+    public CertificateDialog(CertificateDialogListener certificateDialogListener, Certificate certificate){
+        this.listener = certificateDialogListener;
+        this.certificate = certificate;
+    }
+
+    public CertificateDialog( CertificateDialogListener certificateDialogListener, Certificate certificate, int position) {
+        this(certificateDialogListener, certificate);
+        this.position = position;
     }
 
     @NonNull
@@ -41,18 +51,36 @@ public class CertificateDialog extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         dialogView = inflater.inflate(R.layout.certication_dialog, null);
 
+        EditText title = dialogView.findViewById(R.id.title);
+        EditText description = dialogView.findViewById(R.id.description);
+        EditText date = dialogView.findViewById(R.id.date);
+
+
+
+        if(certificate != null) {
+            title.setText(certificate.getTitle());
+            description.setText(certificate.getDescription());
+            date.setText(certificate.getDate());
+            isUpdated = true;
+        }
+
 
         builder.setView(dialogView)
                 // Add action buttons
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                      Certificate certificate = new Certificate("01", ((EditText) dialogView.findViewById(R.id.title)).getText().toString(),
-                               ((EditText) dialogView.findViewById(R.id.description)).getText().toString(),
-                               ((EditText) dialogView.findViewById(R.id.date)).getText().toString()
+
+                      Certificate certificate = new Certificate("01", title.getText().toString(),
+                               description.getText().toString(),
+                               date.getText().toString()
                               );
 
-                      listener.onCertificateAdded(certificate);
+                        if (isUpdated) {
+                            listener.onCertificateUpdated(certificate, position);
+                        } else {
+                            listener.onCertificateAdded(certificate);
+                        }
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
