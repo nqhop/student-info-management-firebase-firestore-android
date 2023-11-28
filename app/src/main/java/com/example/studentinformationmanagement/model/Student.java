@@ -20,7 +20,7 @@ public class Student extends BaseObservable {
     }
 
     public Student(String name, String address, String dayOfBirth,
-                   String classroom, String course, List<Certificate> certificates) {
+                   String classroom, String course, List<Certificate> certificates, String id) {
         this.name = name;
         this.address = address;
         this.dayOfBirth = dayOfBirth;

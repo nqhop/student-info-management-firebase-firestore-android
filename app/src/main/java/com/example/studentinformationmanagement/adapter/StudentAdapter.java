@@ -54,7 +54,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
         holder.itemView.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
         Student student = students.get(position);
         holder.studentNameText.setText(student.getName());
-        holder.studentMailText.setText(student.getMail());
+        holder.studentMailText.setText(student.getEmail());
         holder.studentCourseText.setText(student.getCourse());
     }
 

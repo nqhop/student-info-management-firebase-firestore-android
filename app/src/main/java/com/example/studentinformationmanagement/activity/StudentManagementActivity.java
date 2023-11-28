@@ -72,11 +72,11 @@ public class StudentManagementActivity extends AppCompatActivity {
 
         activityStudentManagementBinding = DataBindingUtil.setContentView(this, R.layout.activity_student_management);
 //        filterPopupBinding = DataBindingUtil.setContentView(this, R.layout.filter_popup);
-        ArrayList<Student> itemList = new ArrayList<>(
-                Arrays.asList(new Student("Bao", "7 District", "01/01/2001", "192.168.1.11", "Java", "01"),
-                        new Student("Tinh", "4 District", "01/01/2001", "192.168.1.12", "Java", "02")
-                )
-        );
+//        ArrayList<Student> itemList = new ArrayList<>(
+//                Arrays.asList(new Student("Bao", "7 District", "01/01/2001", "192.168.1.11", "Java", "01"),
+//                        new Student("Tinh", "4 District", "01/01/2001", "192.168.1.12", "Java", "02")
+//                )
+//        );
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         activityStudentManagementBinding.studentRecyclerView.setLayoutManager(layoutManager);
 
@@ -223,8 +223,9 @@ public class StudentManagementActivity extends AppCompatActivity {
                     // all student are visible initially
                     studentVisitable.add(count++);
                     Map<String, Object> data = document.getData();
+                    filteredData.add(document.toObject(Student.class));
 //                    Student(String name, String address, String dayOfBirth, String classroom, String course, String id)
-                    filteredData.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
+//                    filteredData.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
                     Log.d("getStudentsWithFilter", document.getData().get("course").toString());
                     Log.d("getStudentsWithFilter", String.valueOf(filteredData.size()));
                 }
