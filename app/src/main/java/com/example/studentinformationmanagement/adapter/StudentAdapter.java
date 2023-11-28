@@ -1,6 +1,7 @@
 package com.example.studentinformationmanagement.adapter;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +14,29 @@ import com.example.studentinformationmanagement.R;
 import com.example.studentinformationmanagement.activity.FormActivity;
 import com.example.studentinformationmanagement.model.Student;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentHolder> {
     private List<Student> students;
+    private Set<Integer> studentVisitable = new HashSet<>();
+
+
+    public Set<Integer> getStudentVisitable() {
+        return studentVisitable;
+    }
+
+    public void setStudentVisitable(Set<Integer> studentVisitable) {
+        this.studentVisitable = studentVisitable;
+    }
 
     public StudentAdapter(List<Student> students) {
         this.students = students;
+    }
+
+    public boolean matchWithSearchText(String str){
+        return true;
     }
 
     @NonNull
@@ -32,6 +49,9 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
 
     @Override
     public void onBindViewHolder(@NonNull StudentAdapter.StudentHolder holder, int position) {
+        boolean isVisible = this.studentVisitable.contains(position);
+        Log.d("isVisible", String.valueOf(isVisible));
+        holder.itemView.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
         Student student = students.get(position);
         holder.studentNameText.setText(student.getName());
         holder.studentMailText.setText(student.getMail());
@@ -48,6 +68,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
 
         public StudentHolder(@NonNull View itemView) {
             super(itemView);
+
             studentNameText = itemView.findViewById(R.id.studentNameText);
             studentMailText = itemView.findViewById(R.id.studentMailText);
             studentCourseText = itemView.findViewById(R.id.studentCourseText);
