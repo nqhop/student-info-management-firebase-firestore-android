@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -57,6 +58,7 @@ public class StudentManagementActivity extends AppCompatActivity {
     private List<Student> filteredData = new ArrayList<>();
     private Set<Integer> studentVisitable = new HashSet<>();
     private StudentAdapter studentAdapter;
+    private List<Student> students = new ArrayList<>();
     Button btnfilter;
 
     public StudentManagementActivity() {
@@ -69,6 +71,41 @@ public class StudentManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_management);
         btnfilter = (Button) findViewById(R.id.btnfilter);
+
+
+
+
+//        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        db.collection("Students")
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        Log.d("My_test", "isSuccessful");
+//                        QuerySnapshot querySnapshot = task.getResult();
+//                        if (querySnapshot != null) {
+//                            List<DocumentSnapshot> documents = querySnapshot.getDocuments();
+//                            for (DocumentSnapshot document : documents) {
+//                                // Retrieve information from each document
+//                                String documentId = document.getId();
+//                                Map<String, Object> data = document.getData();
+//                                Log.d("My_test", data.get("course").toString());
+//                                // ...
+//                            }
+//                        } else {
+//                            Log.d("My_test", "Fail");
+//                            // No documents found
+//                            // Handle the case when the collection is empty
+//                        }
+//                    } else {
+//                        // Handle the failure
+//                        Exception e = task.getException();
+//                        if (e != null) {
+//                            // Log or display the error message
+//                        }
+//                    }
+//                });
+
+
 
         activityStudentManagementBinding = DataBindingUtil.setContentView(this, R.layout.activity_student_management);
 //        filterPopupBinding = DataBindingUtil.setContentView(this, R.layout.filter_popup);
@@ -172,9 +209,16 @@ public class StudentManagementActivity extends AppCompatActivity {
                 if (querySnapshot != null && !querySnapshot.isEmpty()) {
                     Log.d("getCourse", "getCollection size" + querySnapshot.size());
 
+//                    studentAdapter.setNumberOfItem(querySnapshot.size());
+
                     for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
                         Map<String, Object> data = documentSnapshot.getData();
                         Log.d("getCourse", "name " + data.get("name"));
+
+                        // Student(String name, String address, String dayOfBirth, String classroom, String course, String id)
+                        students.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
+                        studentAdapter = new StudentAdapter(students);
+
                         // search for name, mail and course
                         String documentData = (String) documentSnapshot.getData().get("course");
                         if(!courses.contains(documentData)){
@@ -217,21 +261,25 @@ public class StudentManagementActivity extends AppCompatActivity {
         query.get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 filteredData.clear();
-                int count = 0;
                 studentVisitable.clear();
+                List<String> studentID = new ArrayList<>();
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     // all student are visible initially
-                    studentVisitable.add(count++);
                     Map<String, Object> data = document.getData();
+                    studentID.add((String) data.get("id"));
 //                    Student(String name, String address, String dayOfBirth, String classroom, String course, String id)
-                    filteredData.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
-                    Log.d("getStudentsWithFilter", document.getData().get("course").toString());
-                    Log.d("getStudentsWithFilter", String.valueOf(filteredData.size()));
+//                    filteredData.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
+//                    Log.d("getStudentsWithFilter", document.getData().get("course").toString());
+//                    Log.d("getStudentsWithFilter", String.valueOf(filteredData.size()));
                 }
+
+                Set<Integer> sVisitable = studentAdapter.getStudentVisitable(studentID);
+                Log.d("studentHiden", "From sVisitable: " + sVisitable.toString());
+                Log.d("studentHiden", "From left: " + studentID.toString());
                 // Create and set the adapter for the RecyclerView
 
-                studentAdapter = new StudentAdapter(filteredData);
-                studentAdapter.setStudentVisitable(studentVisitable);
+//                studentAdapter = new StudentAdapter(filteredData);
+                studentAdapter.setStudentVisitable(sVisitable);
                 activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
 
             })
@@ -279,23 +327,7 @@ public class StudentManagementActivity extends AppCompatActivity {
     private void txtSearch(String str){
         Log.d("txtSearch", str);
         Log.d("txtSearch", String.valueOf(filteredData.size()));
-        studentVisitable.remove(0);
-        studentAdapter.setStudentVisitable(studentVisitable);
-        studentAdapter.notifyItemRemoved(0);
-        studentVisitable.remove(2);
-        studentAdapter.notifyItemRemoved(2);
 
-//        Query searchQuery = collectionReference.whereArrayContains("Students", str);
-//        FirebaseRecyclerOptions<Student> options =
-//                new FirebaseRecyclerOptions.Builder<Student>()
-//                        .setQuery(FirebaseDatabase.getInstance().getReference().child("Students").orderByChild("name").startAt(str).endAt(str+"~"), Student.class)
-//                        .build();
-
-//        studentAdapter = new StudentAdapter(options.getSnapshots());
-//        activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
-
-//        mainAdapter = new MainAdapter(options);
-//        mainAdapter.startListening();
-//        recyclerView.setAdapter(mainAdapter);
+        studentAdapter.search(str.toLowerCase());
     }
 }
