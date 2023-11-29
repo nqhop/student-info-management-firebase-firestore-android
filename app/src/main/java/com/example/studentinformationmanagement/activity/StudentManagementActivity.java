@@ -188,6 +188,7 @@ public class StudentManagementActivity extends AppCompatActivity {
             try {
                 QuerySnapshot querySnapshot = future.get();
                 if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                    students.clear();
                     for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
                         Map<String, Object> data = documentSnapshot.getData();
 
@@ -279,7 +280,12 @@ public class StudentManagementActivity extends AppCompatActivity {
             addStudent.putExtra("id", "");
             startActivity(addStudent);
         } else if (item.getItemId() == R.id.myImport) {
-            Toast.makeText(this, "Import", Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(this, importFromStorage.class);
+            i.putExtra("studentsID", "");
+            startActivity(i);
+            getCourse();
+            txtSearch("");
+//            Toast.makeText(this, "Import", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.myExport) {
             MyCSVWriter myCSVWriter = new MyCSVWriter(this);
             myCSVWriter.exportDataToCSV(studentAdapter.getStudents());
@@ -303,39 +309,7 @@ public class StudentManagementActivity extends AppCompatActivity {
         } else {
             Log.d("Permission","Permission already granted");
         }
-
-
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            Log.d("MyDemo","requestStoragePermission");
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                    REQUEST_CODE_STORAGE_PERMISSION);
-//        } else {
-//            // Permission already granted
-//            // Proceed with file operations
-//
-//            Log.d("MyDemo","Permission already granted");
-//        }
     }
 
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-//                                           @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
-//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                // Permission granted
-//                // Proceed with file operations
-//                Log.d("MyDemo", "Permission granted");
-//            } else {
-//                // Permission denied
-//                // Handle accordingly (e.g., show a message to the user)
-//                Log.d("MyDemo", "Permission denied");
-//            }
-//        } else {
-//            Log.d("MyDemo", "requestCode not equal REQUEST_CODE_STORAGE_PERMISSION");
-//        }
-//    }
 }

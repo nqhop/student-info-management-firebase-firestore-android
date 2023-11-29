@@ -1,6 +1,7 @@
 package com.example.studentinformationmanagement.storage;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import com.example.studentinformationmanagement.model.Certificate;
@@ -12,6 +13,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.opencsv.CSVWriter;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -20,6 +22,8 @@ public class MyCSVWriter {
 
     private DatabaseReference databaseReference;
     private Context context;
+    private static String studentsPath;
+    private static String certificatePath;
 
     public MyCSVWriter(Context context) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -28,8 +32,20 @@ public class MyCSVWriter {
 
 
     public void exportDataToCSV(List<Student> students) {
-//        String.valueOf(System.currentTimeMillis())
-        String csvFilePath = context.getExternalFilesDir(null) + "/" + "students" + ".csv";
+        String folderName = "students";
+        File externalStorageDir = Environment.getExternalStorageDirectory();
+        String csvFilePath = String.valueOf(context.getExternalFilesDir(null));
+        Log.d("CSV", "externalStorageDir " + externalStorageDir);
+        Log.d("CSV", "csvFilePath " + externalStorageDir);
+
+        File folder = new File(csvFilePath, folderName);
+
+        if (!folder.exists() || !folder.isDirectory()) {
+            folder.mkdir();
+        }
+
+        studentsPath = csvFilePath + "/" + folderName;
+        csvFilePath += "/" + folderName +"/" + "students" + ".csv";
 
         Log.d("CSV", csvFilePath);
         Log.d("CSV", "students size " + students.size());
@@ -50,7 +66,21 @@ public class MyCSVWriter {
     }
 
     public void exportCetificateToCSV(List<Certificate> certificateList, String id) {
-        String csvFilePath = context.getExternalFilesDir(null) + "/Cetificate_" + id + ".csv";
+        String folderName = "cetificates";
+        File externalStorageDir = Environment.getExternalStorageDirectory();
+        String csvFilePath = String.valueOf(context.getExternalFilesDir(null));
+        Log.d("CSV", "exportCetificateToCSV " + externalStorageDir);
+        Log.d("CSV", "exportCetificateToCSV " + externalStorageDir);
+
+        File folder = new File(csvFilePath, folderName);
+
+        if (!folder.exists() || !folder.isDirectory()) {
+            folder.mkdir();
+        }
+
+        certificatePath = csvFilePath + "/" + folderName;
+        csvFilePath += "/" + folderName +"/" + id + ".csv";
+
         Log.d("exportCetificateToCSV", csvFilePath);
         Log.d("exportCetificateToCSV", "students size " + certificateList.size());
 
@@ -68,5 +98,13 @@ public class MyCSVWriter {
             Log.d("exportCetificateToCSV", "IOException");
             throw new RuntimeException(e);
         }
+    }
+
+    public static String getStudentsPath() {
+        return studentsPath;
+    }
+
+    public static String getCertificatePath() {
+        return certificatePath;
     }
 }

@@ -258,7 +258,9 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
             myCSVWriter.exportCetificateToCSV(formStudent.getCertificateList(), formStudent.getId());;
             Toast.makeText(this, "Exported", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.myImport) {
-            Toast.makeText(this, "Import", Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(this, importFromStorage.class);
+            i.putExtra("studentsID", formStudent.getId());
+            startActivity(i);
         }
         return super.onOptionsItemSelected(item);
     }
