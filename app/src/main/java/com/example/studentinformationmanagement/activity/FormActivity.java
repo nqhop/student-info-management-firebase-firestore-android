@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,9 +14,12 @@ import android.widget.Toast;
 
 import com.example.studentinformationmanagement.R;
 import com.example.studentinformationmanagement.adapter.CertificateAdapter;
+import com.example.studentinformationmanagement.adapter.ItemClickListener;
 import com.example.studentinformationmanagement.databinding.ActivityFormBinding;
+import com.example.studentinformationmanagement.dialog.AddWarningDialog;
 import com.example.studentinformationmanagement.dialog.CertificateDialog;
 import com.example.studentinformationmanagement.dialog.CertificateDialogListener;
+import com.example.studentinformationmanagement.dialog.DeleteWarningDialog;
 import com.example.studentinformationmanagement.model.Certificate;
 import com.example.studentinformationmanagement.model.Student;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,12 +37,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FormActivity extends AppCompatActivity implements CertificateDialogListener {
+public class FormActivity extends AppCompatActivity implements CertificateDialogListener, ItemClickListener {
     private ActivityFormBinding activityFormBinding;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Students");
     private CertificateAdapter certificateAdapter;
     private String currentId;
+    CertificateDialog dialogFragment;
 
     List<Certificate> certificates;
     Student formStudent;
@@ -52,13 +57,20 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         activityFormBinding = DataBindingUtil.setContentView(this, R.layout.activity_form);
 
         activityFormBinding.addBtn.setOnClickListener(v -> {
+            if(!formStudent.isValid()) {
+                AddWarningDialog.showAddDialog(this, "Item Name", (dialog, which) -> {
+                });
+                return;
+            }
             formStudent.setCertificateList(certificates);
             addStudent(formStudent);
             Toast.makeText(this,  "Complete", Toast.LENGTH_SHORT).show();
         });
 
         activityFormBinding.deleteBtn.setOnClickListener(v -> {
-            deleteStudent();
+            DeleteWarningDialog.showDeleteDialog(this, "Item Name", (dialog, which) -> {
+                deleteStudent();
+            });
         });
 
         activityFormBinding.updateButton.setOnClickListener(v -> {
@@ -66,10 +78,10 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         });
 
 
-       CertificateDialog dialogFragment = new CertificateDialog(this);
+       CertificateDialog dialogFragment = new CertificateDialog(this, null);
 
         activityFormBinding.addCert.setOnClickListener(v -> {
-            dialogFragment.show(getSupportFragmentManager(), "loginDialog");
+            dialogFragment.show(getSupportFragmentManager(), "addDialog");
         });
 
 
@@ -93,8 +105,9 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         activityFormBinding.recyclerView.setLayoutManager(layoutManager);
 
-        certificateAdapter = new CertificateAdapter(certificates);
+        certificateAdapter = new CertificateAdapter(certificates, this);
         activityFormBinding.recyclerView.setAdapter(certificateAdapter);
+        certificateAdapter.setClickListener(this);
     }
 
     public void updateStudent() {
@@ -123,8 +136,7 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         collectionReference.document(currentId).delete()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Intent i = new Intent(this, FormActivity.class);
-                        i.putExtra("id", "");
+                        Intent i = new Intent(this, StudentManagementActivity.class);
                         startActivity(i);
                     } else {
                         // Handle errors
@@ -137,11 +149,14 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
                 .addOnSuccessListener(documentReference -> {
                     // Data added successfully
                     Log.d("Firestore", "DocumentSnapshot added with ID: " + documentReference.getId());
+                    Intent i = new Intent(this, StudentManagementActivity.class);
+                    startActivity(i);
                 })
                 .addOnFailureListener(e -> {
                     // Handle errors
                     Log.w("Firestore", "Error adding document", e);
                 });
+
     }
 
 
@@ -179,5 +194,29 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         certificates.add(certificate);
         formStudent.setCertificateList(certificates);
         certificateAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onCertificateUpdated(Certificate certificate, int position) {
+        certificates.get(position).setTitle(certificate.getTitle());
+        certificates.get(position).setId(certificate.getId());
+        certificates.get(position).setDescription(certificate.getDescription());
+        certificates.get(position).setDate(certificate.getDate());
+        formStudent.setCertificateList(certificates);
+        certificateAdapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public void onCertificateDeleted(int position) {
+        certificates.remove(position);
+        formStudent.setCertificateList(certificates);
+        certificateAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onClick(View v, int pos) {
+        CertificateDialog dialogFragment = new CertificateDialog(this, certificates.get(pos), pos);
+        dialogFragment.show(getSupportFragmentManager(), "updateDialog");
+
     }
 }

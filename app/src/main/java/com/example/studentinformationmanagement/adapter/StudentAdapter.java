@@ -159,7 +159,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
         holder.itemView.setVisibility(isVisible ? View.VISIBLE : View.INVISIBLE);
         Student student = students.get(position);
         holder.studentNameText.setText(student.getName());
-        holder.studentMailText.setText(student.getMail());
+        holder.studentMailText.setText(student.getEmail());
         holder.studentCourseText.setText(student.getCourse());
     }
 
@@ -181,7 +181,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(v.getContext(), FormActivity.class);
-                    i.putExtra("id", "");
+                    i.putExtra("id", "BgtsaIFxMyJkcKLjM8LP");
                     v.getContext().startActivity(i);
                 }
             });

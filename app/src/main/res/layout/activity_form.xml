@@ -17,21 +17,25 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="30dp"
+            android:paddingBottom="28dp"
+            android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="@+id/textView7"
             app:layout_constraintTop_toBottomOf="@+id/textView7">
 
+
             <Button
                 android:id="@+id/delete_btn"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="36dp"
+                android:layout_marginTop="29dp"
                 android:layout_marginEnd="32dp"
-                android:backgroundTint="#D80032"
+                android:background="#BB2525"
                 android:text="Delete"
-                android:textSize="12sp"
+                android:textColor="#BB2525"
+                android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_bias="0.885"
                 app:layout_constraintStart_toEndOf="@+id/textView"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,34 +44,49 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="28dp"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="40dp"
                 android:text="Student Information"
+                android:textColor="@color/black"
                 android:textSize="26sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/add_cert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="Add"
+                app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.796"
+                app:layout_constraintStart_toEndOf="@+id/textView2" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="26dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginEnd="26dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="28dp"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="60dp"
                 android:text="Cerfiticate"
-                android:textSize="32sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="30sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView7" />
-
-            <Button
-                android:id="@+id/add_cert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:text="Add"
-                app:layout_constraintBottom_toTopOf="@+id/recyclerView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.838"
-                app:layout_constraintStart_toEndOf="@+id/textView2" />
+                app:layout_constraintTop_toBottomOf="@+id/emailText" />
 
             <TextView
                 android:id="@+id/textView3"
@@ -77,6 +96,7 @@
                 android:layout_marginTop="137dp"
                 android:layout_marginEnd="27dp"
                 android:text="Student Name"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@+id/name"
                 app:layout_constraintStart_toStartOf="parent"
@@ -94,6 +114,35 @@
                 app:layout_constraintStart_toEndOf="@+id/textView3"
                 app:layout_constraintTop_toTopOf="@+id/textView3" />
 
+
+            <TextView
+                android:id="@+id/student_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="52dp"
+                android:layout_marginEnd="55dp"
+                android:text="Student Id"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/student_id_editText"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+            <EditText
+                android:id="@+id/student_id_editText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="34dp"
+                android:layout_marginEnd="54dp"
+                android:text="@={student.id}"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/student_id"
+                app:layout_constraintTop_toBottomOf="@+id/name" />
+
+
             <TextView
                 android:id="@+id/addressText"
                 android:layout_width="wrap_content"
@@ -102,10 +151,11 @@
                 android:layout_marginTop="55dp"
                 android:layout_marginEnd="70dp"
                 android:text="Address"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@+id/address"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView3" />
+                app:layout_constraintTop_toBottomOf="@+id/student_id" />
 
             <EditText
                 android:id="@+id/address"
@@ -117,7 +167,7 @@
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/addressText"
-                app:layout_constraintTop_toBottomOf="@+id/name" />
+                app:layout_constraintTop_toBottomOf="@+id/student_id" />
 
             <TextView
                 android:id="@+id/textView5"
@@ -127,6 +177,7 @@
                 android:layout_marginTop="42dp"
                 android:layout_marginEnd="47dp"
                 android:text="Day of birth"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@+id/dayOfBirth"
                 app:layout_constraintStart_toStartOf="parent"
@@ -152,6 +203,7 @@
                 android:layout_marginTop="44dp"
                 android:layout_marginEnd="89dp"
                 android:text="Class"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@+id/classroom"
                 app:layout_constraintStart_toStartOf="parent"
@@ -177,6 +229,7 @@
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="79dp"
                 android:text="Course"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@+id/course"
                 app:layout_constraintStart_toStartOf="parent"
@@ -194,16 +247,33 @@
                 app:layout_constraintStart_toEndOf="@+id/textView7"
                 app:layout_constraintTop_toBottomOf="@+id/classroom" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/emailText"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="26dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="26dp"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="79dp"
+                android:text="Email"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/course"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+                app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginEnd="54dp"
+                android:text="@{student.email}"
+                android:enabled="false"
+                android:textSize="16sp"
+                android:layout_marginStart="85dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/emailText"
+                app:layout_constraintTop_toBottomOf="@+id/course" />
 
             <Button
                 android:id="@+id/add_btn"
