@@ -191,9 +191,14 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
 
     @Override
     public void onCertificateAdded(Certificate certificate) {
-        certificates.add(certificate);
-        formStudent.setCertificateList(certificates);
-        certificateAdapter.notifyDataSetChanged();
+        if(!certificate.isValid()){
+            AddWarningDialog.showAddDialog(this, "Item Name", (dialog, which) -> {
+            });
+        } else {
+            certificates.add(certificate);
+            formStudent.setCertificateList(certificates);
+            certificateAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

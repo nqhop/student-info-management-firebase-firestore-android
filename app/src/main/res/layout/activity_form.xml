@@ -25,14 +25,13 @@
 
             <Button
                 android:id="@+id/delete_btn"
-                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="29dp"
                 android:layout_marginEnd="32dp"
-                android:background="#BB2525"
+                android:backgroundTint="#BB2525"
                 android:text="Delete"
-                android:textColor="#BB2525"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.885"
