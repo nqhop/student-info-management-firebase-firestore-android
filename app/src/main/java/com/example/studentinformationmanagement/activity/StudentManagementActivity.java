@@ -60,7 +60,7 @@ public class StudentManagementActivity extends AppCompatActivity {
     private StudentAdapter studentAdapter;
     private List<Student> students = new ArrayList<>();
     private String txtSearch = "";
-    Button btnfilter;
+    Button btnfilter, btnSearch;
 
     public StudentManagementActivity() {
     }
@@ -72,6 +72,9 @@ public class StudentManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_management);
         btnfilter = (Button) findViewById(R.id.btnfilter);
+
+        // not finished
+        btnSearch = (Button) findViewById(R.id.btnSearch);
 
         activityStudentManagementBinding = DataBindingUtil.setContentView(this, R.layout.activity_student_management);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -86,6 +89,28 @@ public class StudentManagementActivity extends AppCompatActivity {
     private void popUpAction() {
         CourseCustomAdapter adapter;
         adapter = new CourseCustomAdapter(this, courses);
+
+        String[] selectedForSearch = {"Name", "Mail", "Course"};
+
+        ArrayAdapter<String> adapterSearch = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, selectedForSearch);
+
+        activityStudentManagementBinding.btnSearch.setOnClickListener(view -> {
+            final DialogPlus dialogPlus = DialogPlus.newDialog(this)
+                    .setContentHolder(new ViewHolder(R.layout.search_popup))
+                    .setExpanded(true)
+                    .setGravity(Gravity.TOP)
+                    .setAdapter(adapterSearch)
+                    .create();
+
+
+            // Get ListView from the dialog layout
+            View dialogContentView = dialogPlus.getHolderView();
+
+
+            ListView listView = (ListView) dialogPlus.getHolderView().findViewById(R.id.selectList);
+            listView.setAdapter(adapterSearch);
+            dialogPlus.show();
+        });
 
         activityStudentManagementBinding.btnfilter.setOnClickListener(view -> {
             final DialogPlus dialogPlus = DialogPlus.newDialog(this)
