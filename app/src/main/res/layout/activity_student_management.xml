@@ -24,6 +24,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <Button
+            android:visibility="gone"
+            android:id="@+id/btnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Search By"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintStart_toEndOf="@+id/btnfilter"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/studentRecyclerView"
             android:layout_width="match_parent"
