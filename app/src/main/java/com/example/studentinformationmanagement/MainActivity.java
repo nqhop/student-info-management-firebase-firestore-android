@@ -27,8 +27,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        MyDemo();
-
         Intent i = new Intent(this, FormActivity.class);
         i.putExtra("id", "");
 //        startActivity(i);
@@ -41,38 +39,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
-    public void MyDemo(){
-
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-            Log.d("MyDemo","From MainActivity Permission OK");
-        }else {
-            Log.d("MyDemo", "From MainActivity Permission not OK");
-        }
-
-        // Get the app-specific directory in external storage
-        File directory = getExternalFilesDir(null);
-        Log.d("MyDemo","From MainActivity " + directory.toString());
-
-        if (directory != null) {
-            // Create a file object within the app-specific directory
-            File file = new File(directory, "example.txt");
-
-            try {
-                // Create a FileWriter object to write the file
-                FileWriter writer = new FileWriter(file);
-
-                // Write data to the file
-                writer.write("Hello, world!");
-
-                // Close the FileWriter
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

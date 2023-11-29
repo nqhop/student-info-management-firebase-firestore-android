@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,6 +24,7 @@ import com.example.studentinformationmanagement.dialog.CertificateDialogListener
 import com.example.studentinformationmanagement.dialog.DeleteWarningDialog;
 import com.example.studentinformationmanagement.model.Certificate;
 import com.example.studentinformationmanagement.model.Student;
+import com.example.studentinformationmanagement.storage.MyCSVWriter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -47,11 +50,13 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
 
     List<Certificate> certificates;
     Student formStudent;
+    Boolean addNew = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         formStudent = new Student();
         activityFormBinding = DataBindingUtil.setContentView(this, R.layout.activity_form);
@@ -95,11 +100,13 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
             activityFormBinding.setStudent(formStudent);
             currentId = null;
             activityFormBinding.deleteBtn.setVisibility(View.INVISIBLE);
+            addNew = true;
         } else {
             getStudent(id);
             currentId = id;
             activityFormBinding.addBtn.setVisibility(View.GONE);
             activityFormBinding.updateButton.setVisibility(View.VISIBLE);
+            addNew = false;
         }
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -108,6 +115,12 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         certificateAdapter = new CertificateAdapter(certificates, this);
         activityFormBinding.recyclerView.setAdapter(certificateAdapter);
         certificateAdapter.setClickListener(this);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return super.onSupportNavigateUp();
     }
 
     public void updateStudent() {
@@ -223,5 +236,30 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         CertificateDialog dialogFragment = new CertificateDialog(this, certificates.get(pos), pos);
         dialogFragment.show(getSupportFragmentManager(), "updateDialog");
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(addNew) return true;
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        menu.findItem(R.id.addStudent).setVisible(false);
+        menu.findItem(R.id.search).setVisible(false);
+        menu.findItem(R.id.loginHistory).setVisible(false);
+        menu.findItem(R.id.myExport).setTitle("Export certificate");
+        menu.findItem(R.id.myImport).setTitle("Import certificate");
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.myExport){
+            MyCSVWriter myCSVWriter = new MyCSVWriter(this);
+            myCSVWriter.exportCetificateToCSV(formStudent.getCertificateList(), formStudent.getId());;
+            Toast.makeText(this, "Exported", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.myImport) {
+            Toast.makeText(this, "Import", Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
