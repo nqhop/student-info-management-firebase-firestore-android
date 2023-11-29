@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int REQUEST_CODE_STORAGE_PERMISSION = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 //        MyDemo();
-        requestStoragePermission();
 
         Intent i = new Intent(this, FormActivity.class);
         i.putExtra("id", "");
@@ -41,52 +40,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void requestStoragePermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            Log.d("MyDemo","requestStoragePermission");
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},
-                    REQUEST_CODE_STORAGE_PERMISSION);
-        } else {
-            // Permission already granted
-            // Proceed with file operations
-            Log.d("MyDemo","Permission already granted");
-        }
 
 
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            Log.d("MyDemo","requestStoragePermission");
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                    REQUEST_CODE_STORAGE_PERMISSION);
-//        } else {
-//            // Permission already granted
-//            // Proceed with file operations
-//
-//            Log.d("MyDemo","Permission already granted");
-//        }
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted
-                // Proceed with file operations
-                Log.d("MyDemo", "Permission granted");
-            } else {
-                // Permission denied
-                // Handle accordingly (e.g., show a message to the user)
-                Log.d("MyDemo", "Permission denied");
-            }
-        } else {
-            Log.d("MyDemo", "requestCode not equal REQUEST_CODE_STORAGE_PERMISSION");
-        }
-    }
 
 
     public void MyDemo(){
@@ -96,9 +52,6 @@ public class MainActivity extends AppCompatActivity {
         }else {
             Log.d("MyDemo", "From MainActivity Permission not OK");
         }
-
-
-
 
         // Get the app-specific directory in external storage
         File directory = getExternalFilesDir(null);

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.studentinformationmanagement.model.Student;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,19 +32,21 @@ public class MyCSVWriter {
     }
 
 
-    public void exportDataToCSV() {
-        String csvFilePath = context.getExternalFilesDir(null) + "/exportNew.csv";
-        String csvFilePath2 = context.getExternalFilesDir(null) + "/t4.csv";
+    public void exportDataToCSV(List<Student> students) {
+
+        String csvFilePath = context.getExternalFilesDir(null) + "/" + String.valueOf(System.currentTimeMillis()) + ".csv";
+        String csvFilePath2 = context.getExternalFilesDir(null) + "/" + String.valueOf(System.currentTimeMillis());
 
         Log.d("CSV", csvFilePath);
+        Log.d("CSV", "students size " + students.size());
         try (CSVWriter writer = new CSVWriter(new FileWriter(csvFilePath))) {
 
-            String[] headerRecord = { "id", "code", "name" };
+            String[] headerRecord = { "id", "name", "address", "classroom", "email", "course", "dayOfBirth"};
             writer.writeNext(headerRecord);
 
-            writer.writeNext(new String[] { "1", "US", "United States" });
-            writer.writeNext(new String[] { "2", "VN", "Viet Nam đó nha" });
-            writer.writeNext(new String[] { "3", "AU", "Australia" });
+            students.forEach(s -> {
+                writer.writeNext(new String[] {s.getId(), s.getName(), s.getAddress(), s.getClassroom(), s.getEmail(), s.getCourse(), s.getDayOfBirth()});
+            });
 
             Log.d("CSV", "exportDataToCSV successful");
         } catch (IOException e) {
@@ -51,30 +54,6 @@ public class MyCSVWriter {
             throw new RuntimeException(e);
         }
 
-
-//        try {
-//            // Create a FileWriter object to write the file
-//            FileWriter writer = new FileWriter(csvFilePath);
-//
-//            // Create a CSVWriter object
-//            CSVWriter csvWriter = new CSVWriter(writer);
-//
-//            // Write the CSV content
-//            String[] header = {"Name", "Email"};
-//            csvWriter.writeNext(header);
-//
-//            String[] row1 = {"John Doe", "johndoe@example.com"};
-//            csvWriter.writeNext(row1);
-//
-//            String[] row2 = {"Jane Smith", "janesmith@example.com"};
-//            csvWriter.writeNext(row2);
-//
-//            // Close the CSVWriter and FileWriter
-//            csvWriter.close();
-//            writer.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
 
 

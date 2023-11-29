@@ -69,6 +69,7 @@ import java.util.concurrent.ExecutionException;
 public class StudentManagementActivity extends AppCompatActivity {
 
     private ActivityStudentManagementBinding activityStudentManagementBinding;
+    private static final int REQUEST_CODE_STORAGE_PERMISSION = 1;
     private FilterPopupBinding filterPopupBinding;
     private ArrayList<String> courses = new ArrayList<>();
     private List<String> filterCourses = new ArrayList<>();
@@ -97,43 +98,10 @@ public class StudentManagementActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         activityStudentManagementBinding.studentRecyclerView.setLayoutManager(layoutManager);
 
+        requestStoragePermission();
         // handle filter
         getCourse();
         popUpAction();
-
-
-        //read and write file
-//        requestPermission();
-        if(checkPermission()){
-            Toast.makeText(StudentManagementActivity.this, "permision allowed", Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(StudentManagementActivity.this, "permision not allowed", Toast.LENGTH_SHORT).show();
-            requestPermission();
-        }
-
-
-
-
-
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-//            if(!Environment.isExternalStorageManager()){
-//                try {
-//                    Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
-//                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
-//                    intent.addCategory("android.intent.category.DEFAULT");
-//                    intent.setData(Uri.parse(String.format("package:%s", getApplicationContext().getPackageName())));
-//                    startActivity(intent);
-//                } catch (Exception ex){
-//                    Intent intent = new Intent();
-//                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-//                    startActivity(intent);
-//                }
-//            }
-//        } else {
-//            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
-//            }
-//        }
 
         ActivityCompat.requestPermissions(StudentManagementActivity.this, new String[]{READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE},111);
 
@@ -314,8 +282,8 @@ public class StudentManagementActivity extends AppCompatActivity {
             Toast.makeText(this, "Import", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.myExport) {
             MyCSVWriter myCSVWriter = new MyCSVWriter(this);
-            myCSVWriter.exportDataToCSV();
-            Toast.makeText(this, "Export nè", Toast.LENGTH_SHORT).show();
+            myCSVWriter.exportDataToCSV(studentAdapter.getStudents());
+            Toast.makeText(this, "Exported", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -324,17 +292,50 @@ public class StudentManagementActivity extends AppCompatActivity {
         studentAdapter.search(str.toLowerCase());
     }
 
-    private boolean checkPermission() {
-        if(ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-            return true;
+
+    private void requestStoragePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission","requestStoragePermission");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},
+                    REQUEST_CODE_STORAGE_PERMISSION);
+        } else {
+            Log.d("Permission","Permission already granted");
         }
-        return false;
-    }
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{WRITE_EXTERNAL_STORAGE},
-                111);
+
+
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            Log.d("MyDemo","requestStoragePermission");
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    REQUEST_CODE_STORAGE_PERMISSION);
+//        } else {
+//            // Permission already granted
+//            // Proceed with file operations
+//
+//            Log.d("MyDemo","Permission already granted");
+//        }
     }
 
 
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+//                                           @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
+//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                // Permission granted
+//                // Proceed with file operations
+//                Log.d("MyDemo", "Permission granted");
+//            } else {
+//                // Permission denied
+//                // Handle accordingly (e.g., show a message to the user)
+//                Log.d("MyDemo", "Permission denied");
+//            }
+//        } else {
+//            Log.d("MyDemo", "requestCode not equal REQUEST_CODE_STORAGE_PERMISSION");
+//        }
+//    }
 }
