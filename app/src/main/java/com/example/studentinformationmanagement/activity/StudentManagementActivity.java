@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -57,7 +58,9 @@ public class StudentManagementActivity extends AppCompatActivity {
     private List<Student> filteredData = new ArrayList<>();
     private Set<Integer> studentVisitable = new HashSet<>();
     private StudentAdapter studentAdapter;
-    Button btnfilter;
+    private List<Student> students = new ArrayList<>();
+    private String txtSearch = "";
+    Button btnfilter, btnSearch;
 
     public StudentManagementActivity() {
     }
@@ -70,25 +73,16 @@ public class StudentManagementActivity extends AppCompatActivity {
         setContentView(R.layout.activity_student_management);
         btnfilter = (Button) findViewById(R.id.btnfilter);
 
+        // not finished
+        btnSearch = (Button) findViewById(R.id.btnSearch);
+
         activityStudentManagementBinding = DataBindingUtil.setContentView(this, R.layout.activity_student_management);
-//        filterPopupBinding = DataBindingUtil.setContentView(this, R.layout.filter_popup);
-//        ArrayList<Student> itemList = new ArrayList<>(
-//                Arrays.asList(new Student("Bao", "7 District", "01/01/2001", "192.168.1.11", "Java", "01"),
-//                        new Student("Tinh", "4 District", "01/01/2001", "192.168.1.12", "Java", "02")
-//                )
-//        );
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         activityStudentManagementBinding.studentRecyclerView.setLayoutManager(layoutManager);
 
-
-//        studentAdapter = new StudentAdapter(itemList);
-//        activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
-
         // handle filter
         getCourse();
-//        searchhelper();
         popUpAction();
-//        getStudentsWithFilter(null);
     }
 
 
@@ -96,36 +90,34 @@ public class StudentManagementActivity extends AppCompatActivity {
         CourseCustomAdapter adapter;
         adapter = new CourseCustomAdapter(this, courses);
 
+        String[] selectedForSearch = {"Name", "Mail", "Course"};
+
+        ArrayAdapter<String> adapterSearch = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, selectedForSearch);
+
+        activityStudentManagementBinding.btnSearch.setOnClickListener(view -> {
+            final DialogPlus dialogPlus = DialogPlus.newDialog(this)
+                    .setContentHolder(new ViewHolder(R.layout.search_popup))
+                    .setExpanded(true)
+                    .setGravity(Gravity.TOP)
+                    .setAdapter(adapterSearch)
+                    .create();
+
+
+            // Get ListView from the dialog layout
+            View dialogContentView = dialogPlus.getHolderView();
+
+
+            ListView listView = (ListView) dialogPlus.getHolderView().findViewById(R.id.selectList);
+            listView.setAdapter(adapterSearch);
+            dialogPlus.show();
+        });
+
         activityStudentManagementBinding.btnfilter.setOnClickListener(view -> {
             final DialogPlus dialogPlus = DialogPlus.newDialog(this)
                     .setContentHolder(new ViewHolder(R.layout.filter_popup))
                     .setExpanded(true)
                     .setGravity(Gravity.TOP)
                     .setAdapter(adapter)
-//                    .setOnItemClickListener(new OnItemClickListener() {
-//                        @Override
-//                        public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-//                            // Handle list item clicks
-//                            String selectedItem = courses.get(position);
-//                            Toast.makeText(StudentManagementActivity.this, "Selected from DialogPlus: " + selectedItem, Toast.LENGTH_SHORT).show();
-//                            Log.d("course", "Selected");
-//                            dialog.dismiss();
-//                        }
-//                    })
-//                    .setOnClickListener(new OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogPlus dialog, View view) {
-//                            view.findViewById(R.id.btnUpdate).setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    filterCourses.clear();
-//                                    adapter.getSelectedItems().stream().forEach(x -> filterCourses.add(courses.get(x)));
-//                                    getStudentsWithFilter(filterCourses);
-//                                    Toast.makeText(StudentManagementActivity.this, "Updated", Toast.LENGTH_SHORT).show();
-//                                }
-//                            });
-//                        }
-//                    })
                     .create();
 
             View dialogContentView = dialogPlus.getHolderView();
@@ -170,11 +162,13 @@ public class StudentManagementActivity extends AppCompatActivity {
             try {
                 QuerySnapshot querySnapshot = future.get();
                 if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                    Log.d("getCourse", "getCollection size" + querySnapshot.size());
-
                     for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
                         Map<String, Object> data = documentSnapshot.getData();
-                        Log.d("getCourse", "name " + data.get("name"));
+
+                        // Student(String name, String address, String dayOfBirth, String classroom, String course, String id)
+                        students.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
+                        studentAdapter = new StudentAdapter(students);
+
                         // search for name, mail and course
                         String documentData = (String) documentSnapshot.getData().get("course");
                         if(!courses.contains(documentData)){
@@ -182,7 +176,6 @@ public class StudentManagementActivity extends AppCompatActivity {
                         }
                     }
                 }
-                Log.d("getCourse", String.valueOf(courses.size()));
 
                 // init list student
                 List<String> filterValues = new ArrayList<>();
@@ -197,14 +190,6 @@ public class StudentManagementActivity extends AppCompatActivity {
             }
         });
     }
-//    private void searchhelper() {
-//        collectionReference.get().addOnCompleteListener(task -> {
-//            if(task.isSuccessful()){
-//                QuerySnapshot querySnapshot = task.getResult();
-//                if(querySnapshot != null && !querySnapshot)
-//            }
-//        })
-//    }
 
     private void getStudentsWithFilter(List<String> filterValues){
 
@@ -217,24 +202,20 @@ public class StudentManagementActivity extends AppCompatActivity {
         query.get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 filteredData.clear();
-                int count = 0;
                 studentVisitable.clear();
+                List<String> studentID = new ArrayList<>();
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                     // all student are visible initially
-                    studentVisitable.add(count++);
                     Map<String, Object> data = document.getData();
-                    filteredData.add(document.toObject(Student.class));
-//                    Student(String name, String address, String dayOfBirth, String classroom, String course, String id)
-//                    filteredData.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
-                    Log.d("getStudentsWithFilter", document.getData().get("course").toString());
-                    Log.d("getStudentsWithFilter", String.valueOf(filteredData.size()));
+                    studentID.add((String) data.get("id"));
                 }
+
+                Set<Integer> sVisitable = studentAdapter.getStudentVisitable(studentID);
                 // Create and set the adapter for the RecyclerView
 
-                studentAdapter = new StudentAdapter(filteredData);
-                studentAdapter.setStudentVisitable(studentVisitable);
+                studentAdapter.setStudentVisitable(sVisitable);
                 activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
-
+                txtSearch(txtSearch);
             })
             .addOnFailureListener(e -> {
                 // Handle query failure
@@ -278,25 +259,7 @@ public class StudentManagementActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     private void txtSearch(String str){
-        Log.d("txtSearch", str);
-        Log.d("txtSearch", String.valueOf(filteredData.size()));
-        studentVisitable.remove(0);
-        studentAdapter.setStudentVisitable(studentVisitable);
-        studentAdapter.notifyItemRemoved(0);
-        studentVisitable.remove(2);
-        studentAdapter.notifyItemRemoved(2);
-
-//        Query searchQuery = collectionReference.whereArrayContains("Students", str);
-//        FirebaseRecyclerOptions<Student> options =
-//                new FirebaseRecyclerOptions.Builder<Student>()
-//                        .setQuery(FirebaseDatabase.getInstance().getReference().child("Students").orderByChild("name").startAt(str).endAt(str+"~"), Student.class)
-//                        .build();
-
-//        studentAdapter = new StudentAdapter(options.getSnapshots());
-//        activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
-
-//        mainAdapter = new MainAdapter(options);
-//        mainAdapter.startListening();
-//        recyclerView.setAdapter(mainAdapter);
+        txtSearch = str;
+        studentAdapter.search(str.toLowerCase());
     }
 }
