@@ -59,6 +59,7 @@ public class StudentManagementActivity extends AppCompatActivity {
     private Set<Integer> studentVisitable = new HashSet<>();
     private StudentAdapter studentAdapter;
     private List<Student> students = new ArrayList<>();
+    private String txtSearch = "";
     Button btnfilter;
 
     public StudentManagementActivity() {
@@ -72,60 +73,13 @@ public class StudentManagementActivity extends AppCompatActivity {
         setContentView(R.layout.activity_student_management);
         btnfilter = (Button) findViewById(R.id.btnfilter);
 
-
-
-
-//        FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        db.collection("Students")
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        Log.d("My_test", "isSuccessful");
-//                        QuerySnapshot querySnapshot = task.getResult();
-//                        if (querySnapshot != null) {
-//                            List<DocumentSnapshot> documents = querySnapshot.getDocuments();
-//                            for (DocumentSnapshot document : documents) {
-//                                // Retrieve information from each document
-//                                String documentId = document.getId();
-//                                Map<String, Object> data = document.getData();
-//                                Log.d("My_test", data.get("course").toString());
-//                                // ...
-//                            }
-//                        } else {
-//                            Log.d("My_test", "Fail");
-//                            // No documents found
-//                            // Handle the case when the collection is empty
-//                        }
-//                    } else {
-//                        // Handle the failure
-//                        Exception e = task.getException();
-//                        if (e != null) {
-//                            // Log or display the error message
-//                        }
-//                    }
-//                });
-
-
-
         activityStudentManagementBinding = DataBindingUtil.setContentView(this, R.layout.activity_student_management);
-//        filterPopupBinding = DataBindingUtil.setContentView(this, R.layout.filter_popup);
-        ArrayList<Student> itemList = new ArrayList<>(
-                Arrays.asList(new Student("Bao", "7 District", "01/01/2001", "192.168.1.11", "Java", "01"),
-                        new Student("Tinh", "4 District", "01/01/2001", "192.168.1.12", "Java", "02")
-                )
-        );
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         activityStudentManagementBinding.studentRecyclerView.setLayoutManager(layoutManager);
 
-
-//        studentAdapter = new StudentAdapter(itemList);
-//        activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
-
         // handle filter
         getCourse();
-//        searchhelper();
         popUpAction();
-//        getStudentsWithFilter(null);
     }
 
 
@@ -139,30 +93,6 @@ public class StudentManagementActivity extends AppCompatActivity {
                     .setExpanded(true)
                     .setGravity(Gravity.TOP)
                     .setAdapter(adapter)
-//                    .setOnItemClickListener(new OnItemClickListener() {
-//                        @Override
-//                        public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-//                            // Handle list item clicks
-//                            String selectedItem = courses.get(position);
-//                            Toast.makeText(StudentManagementActivity.this, "Selected from DialogPlus: " + selectedItem, Toast.LENGTH_SHORT).show();
-//                            Log.d("course", "Selected");
-//                            dialog.dismiss();
-//                        }
-//                    })
-//                    .setOnClickListener(new OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogPlus dialog, View view) {
-//                            view.findViewById(R.id.btnUpdate).setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    filterCourses.clear();
-//                                    adapter.getSelectedItems().stream().forEach(x -> filterCourses.add(courses.get(x)));
-//                                    getStudentsWithFilter(filterCourses);
-//                                    Toast.makeText(StudentManagementActivity.this, "Updated", Toast.LENGTH_SHORT).show();
-//                                }
-//                            });
-//                        }
-//                    })
                     .create();
 
             View dialogContentView = dialogPlus.getHolderView();
@@ -207,13 +137,8 @@ public class StudentManagementActivity extends AppCompatActivity {
             try {
                 QuerySnapshot querySnapshot = future.get();
                 if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                    Log.d("getCourse", "getCollection size" + querySnapshot.size());
-
-//                    studentAdapter.setNumberOfItem(querySnapshot.size());
-
                     for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
                         Map<String, Object> data = documentSnapshot.getData();
-                        Log.d("getCourse", "name " + data.get("name"));
 
                         // Student(String name, String address, String dayOfBirth, String classroom, String course, String id)
                         students.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
@@ -226,7 +151,6 @@ public class StudentManagementActivity extends AppCompatActivity {
                         }
                     }
                 }
-                Log.d("getCourse", String.valueOf(courses.size()));
 
                 // init list student
                 List<String> filterValues = new ArrayList<>();
@@ -241,14 +165,6 @@ public class StudentManagementActivity extends AppCompatActivity {
             }
         });
     }
-//    private void searchhelper() {
-//        collectionReference.get().addOnCompleteListener(task -> {
-//            if(task.isSuccessful()){
-//                QuerySnapshot querySnapshot = task.getResult();
-//                if(querySnapshot != null && !querySnapshot)
-//            }
-//        })
-//    }
 
     private void getStudentsWithFilter(List<String> filterValues){
 
@@ -267,21 +183,14 @@ public class StudentManagementActivity extends AppCompatActivity {
                     // all student are visible initially
                     Map<String, Object> data = document.getData();
                     studentID.add((String) data.get("id"));
-//                    Student(String name, String address, String dayOfBirth, String classroom, String course, String id)
-//                    filteredData.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
-//                    Log.d("getStudentsWithFilter", document.getData().get("course").toString());
-//                    Log.d("getStudentsWithFilter", String.valueOf(filteredData.size()));
                 }
 
                 Set<Integer> sVisitable = studentAdapter.getStudentVisitable(studentID);
-                Log.d("studentHiden", "From sVisitable: " + sVisitable.toString());
-                Log.d("studentHiden", "From left: " + studentID.toString());
                 // Create and set the adapter for the RecyclerView
 
-//                studentAdapter = new StudentAdapter(filteredData);
                 studentAdapter.setStudentVisitable(sVisitable);
                 activityStudentManagementBinding.studentRecyclerView.setAdapter(studentAdapter);
-
+                txtSearch(txtSearch);
             })
             .addOnFailureListener(e -> {
                 // Handle query failure
@@ -325,9 +234,7 @@ public class StudentManagementActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     private void txtSearch(String str){
-        Log.d("txtSearch", str);
-        Log.d("txtSearch", String.valueOf(filteredData.size()));
-
+        txtSearch = str;
         studentAdapter.search(str.toLowerCase());
     }
 }

@@ -28,6 +28,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
     private List<String> studentsMergeTextForSearch;
     private Set<Integer> studentVisitable = new HashSet<>();
     private List<Integer> studentHiden = new ArrayList<>();
+    private Set<Integer> studentVisitableFilter;
 
     public Set<Integer> getStudentVisitable(List<String> studentIDs) {
         Set<Integer> sVisitable = new HashSet<>();
@@ -43,17 +44,18 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
     }
 
     public void setStudentVisitable(Set<Integer> studentVisitable) {
-        Log.d("studentHiden", "studentVisitable input: " +  studentVisitable.toString());
+        Log.d("setStudentVisitable", "studentVisitable input: " +  studentVisitable.toString());
         this.students = new ArrayList<>(studentsInitial);
         this.studentsFilter = new ArrayList<>(studentsInitial);
         this.studentHiden.clear();
+        this.studentVisitableFilter = studentVisitable;
 
         this.studentVisitable.forEach(index -> {
             if (!studentVisitable.contains(index)){
                 studentHiden.add(index);
             }
         });
-        Log.d("studentHiden", studentHiden.toString());
+        Log.d("studentHiden", "From setStudentVisitable " + studentHiden.toString());
 
         Collections.sort(studentHiden, Comparator.reverseOrder());
         for (int position : studentHiden){
@@ -75,32 +77,21 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
     }
 
     public void search(String str){
-
-        Log.d("search", "String: " + str);
-//        for(int i = 0; i < studentsMergeTextForSearch.size(); i++){
-//            Log.d("search", "studentsMergeTextForSearch: " + studentsMergeTextForSearch.get(i));
-//        }
-
-
-
         List<Integer> sVisitable = new ArrayList<>();
 
         for(int i = 0; i < studentsMergeTextForSearch.size(); i++){
-//            Log.d("search", "studentsMergeTextForSearch: " + studentsMergeTextForSearch.get(i));
-//            Log.d("search", "studentsMergeTextForSearch: " + studentsMergeTextForSearch.get(i).contains(str));
             if(studentsMergeTextForSearch.get(i).contains(str)){
                 sVisitable.add(i);
             }
         }
         Log.d("search", "sVisitable " + sVisitable.toString());
-        List<Integer> newStudentVisitable = FilterAndSearch(sVisitable);
+        List<Integer> newStudentVisitable = FilterAndSearch(studentVisitableFilter, sVisitable);
         Collections.sort(newStudentVisitable, Comparator.reverseOrder());
         Log.d("search", "newStudentVisitable " + newStudentVisitable);
 
-        Set<Integer> studentsFilterShow = new HashSet<>();
         Set<Integer> studentsFilterHiden = new HashSet<>();
 
-        for(int i = 0; i < studentsFilter.size(); i++){
+        for(int i = 0; i < studentsInitial.size(); i++){
             if(!newStudentVisitable.contains(i)){
                 studentsFilterHiden.add(i);
             };
@@ -111,45 +102,31 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
         Log.d("search", "studentsFilter size " + studentsFilter.size());
 
 
-        this.students = new ArrayList<>(studentsFilter);
+        students.clear();
         notifyDataSetChanged();
-        for (int position : studentsFilterHiden){
+
+        for (int position : newStudentVisitable){
             try {
-                students.remove(position);
+                students.add(studentsInitial.get(position));
             }catch (Exception e){}
-
-            notifyItemRemoved(position);
         }
+        notifyDataSetChanged();
 
-
-
-
-
-
-//        for (int position : studentHiden){
-//            students.remove(position);
-//            notifyItemRemoved(position);
-//        }
     }
 
-    public List<Integer> FilterAndSearch(List<Integer> sVisitable){
+    public List<Integer> FilterAndSearch(Set<Integer> studentVisitableFilter, List<Integer> sVisitable){
         Log.d("FilterAndSearch", "FilterAndSearch------------");
-        List<Integer> sVisit = new ArrayList<>();
-        for(int i = 0; i < studentsFilter.size(); i++){
-            Log.d("FilterAndSearch", "i -> " + studentsFilter.get(i).getId());
-            for(int j = 0; j < sVisitable.size(); j++){
-                Log.d("FilterAndSearch", "J -> " + studentsInitial.get(sVisitable.get(j)).getId());
-                if(studentsInitial.get(sVisitable.get(j)).getId().equals(studentsFilter.get(i).getId())){
-                    sVisit.add(i);
-                    continue;
-                }
+        Log.d("FilterAndSearch", "studentVisitableFilter " + studentVisitableFilter.toString());
+        Log.d("FilterAndSearch", "sVisitable " + sVisitable.toString());
+        List<Integer> combinedList = new ArrayList<>();
+
+        for (Integer element : sVisitable) {
+            if (studentVisitableFilter.contains(element)) {
+                combinedList.add(element);
             }
         }
-        return  sVisit;
-    }
-    public void clearSelections() {
-        studentVisitable.clear();
-        notifyDataSetChanged();
+        Log.d("FilterAndSearch", "combinedList " + combinedList.toString());
+        return  combinedList;
     }
 
     public StudentAdapter(List<Student> students) {
@@ -166,9 +143,6 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
             studentVisitable.add(i);
     }
 
-    public boolean matchWithSearchText(String str){
-        return true;
-    }
 
     @NonNull
     @Override
@@ -209,7 +183,6 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
                     Intent i = new Intent(v.getContext(), FormActivity.class);
                     i.putExtra("id", "");
                     v.getContext().startActivity(i);
-
                 }
             });
         }
