@@ -1,12 +1,23 @@
 package com.example.studentinformationmanagement.activity;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -28,6 +39,7 @@ import com.example.studentinformationmanagement.databinding.FilterPopupBinding;
 import com.example.studentinformationmanagement.model.Certificate;
 import com.example.studentinformationmanagement.model.Course;
 import com.example.studentinformationmanagement.model.Student;
+import com.example.studentinformationmanagement.storage.MyCSVWriter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
@@ -36,11 +48,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.orhanobut.dialogplus.BuildConfig;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.OnClickListener;
 import com.orhanobut.dialogplus.OnItemClickListener;
 import com.orhanobut.dialogplus.ViewHolder;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -53,6 +69,7 @@ import java.util.concurrent.ExecutionException;
 public class StudentManagementActivity extends AppCompatActivity {
 
     private ActivityStudentManagementBinding activityStudentManagementBinding;
+    private static final int REQUEST_CODE_STORAGE_PERMISSION = 1;
     private FilterPopupBinding filterPopupBinding;
     private ArrayList<String> courses = new ArrayList<>();
     private List<String> filterCourses = new ArrayList<>();
@@ -81,10 +98,18 @@ public class StudentManagementActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         activityStudentManagementBinding.studentRecyclerView.setLayoutManager(layoutManager);
 
+        requestStoragePermission();
         // handle filter
         getCourse();
         popUpAction();
+
+        ActivityCompat.requestPermissions(StudentManagementActivity.this, new String[]{READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE},111);
+
+
     }
+
+
+
 
 
     private void popUpAction() {
@@ -256,7 +281,9 @@ public class StudentManagementActivity extends AppCompatActivity {
         } else if (item.getItemId() == R.id.myImport) {
             Toast.makeText(this, "Import", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.myExport) {
-            Toast.makeText(this, "Export", Toast.LENGTH_SHORT).show();
+            MyCSVWriter myCSVWriter = new MyCSVWriter(this);
+            myCSVWriter.exportDataToCSV(studentAdapter.getStudents());
+            Toast.makeText(this, "Exported", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -264,4 +291,51 @@ public class StudentManagementActivity extends AppCompatActivity {
         txtSearch = str;
         studentAdapter.search(str.toLowerCase());
     }
+
+
+    private void requestStoragePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission","requestStoragePermission");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},
+                    REQUEST_CODE_STORAGE_PERMISSION);
+        } else {
+            Log.d("Permission","Permission already granted");
+        }
+
+
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            Log.d("MyDemo","requestStoragePermission");
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    REQUEST_CODE_STORAGE_PERMISSION);
+//        } else {
+//            // Permission already granted
+//            // Proceed with file operations
+//
+//            Log.d("MyDemo","Permission already granted");
+//        }
+    }
+
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+//                                           @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
+//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                // Permission granted
+//                // Proceed with file operations
+//                Log.d("MyDemo", "Permission granted");
+//            } else {
+//                // Permission denied
+//                // Handle accordingly (e.g., show a message to the user)
+//                Log.d("MyDemo", "Permission denied");
+//            }
+//        } else {
+//            Log.d("MyDemo", "requestCode not equal REQUEST_CODE_STORAGE_PERMISSION");
+//        }
+//    }
 }

@@ -43,6 +43,10 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
         return sVisitable;
     }
 
+    public List<Student> getStudents(){
+        return this.students;
+    }
+
     public void setStudentVisitable(Set<Integer> studentVisitable) {
         Log.d("setStudentVisitable", "studentVisitable input: " +  studentVisitable.toString());
         this.students = new ArrayList<>(studentsInitial);
