@@ -25,6 +25,7 @@ import com.example.studentinformationmanagement.adapter.CourseCustomAdapter;
 import com.example.studentinformationmanagement.adapter.StudentAdapter;
 import com.example.studentinformationmanagement.databinding.ActivityStudentManagementBinding;
 import com.example.studentinformationmanagement.databinding.FilterPopupBinding;
+import com.example.studentinformationmanagement.model.Certificate;
 import com.example.studentinformationmanagement.model.Course;
 import com.example.studentinformationmanagement.model.Student;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -165,8 +166,9 @@ public class StudentManagementActivity extends AppCompatActivity {
                     for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
                         Map<String, Object> data = documentSnapshot.getData();
 
-                        // Student(String name, String address, String dayOfBirth, String classroom, String course, String id)
-                        students.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), (String) data.get("id")));
+//                        (String name, String address, String dayOfBirth,
+//                                String classroom, String course, List< Certificate > certificates, String id)
+                        students.add(new Student((String) data.get("name"), (String) data.get("address"), (String) data.get("dayOfBirth"), (String) data.get("classroom"), (String) data.get("course"), null, (String) data.get("id")));
                         studentAdapter = new StudentAdapter(students);
 
                         // search for name, mail and course
