@@ -1,12 +1,23 @@
 package com.example.studentinformationmanagement.activity;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -28,6 +39,7 @@ import com.example.studentinformationmanagement.databinding.FilterPopupBinding;
 import com.example.studentinformationmanagement.model.Certificate;
 import com.example.studentinformationmanagement.model.Course;
 import com.example.studentinformationmanagement.model.Student;
+import com.example.studentinformationmanagement.storage.MyCSVWriter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
@@ -36,11 +48,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.orhanobut.dialogplus.BuildConfig;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.OnClickListener;
 import com.orhanobut.dialogplus.OnItemClickListener;
 import com.orhanobut.dialogplus.ViewHolder;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -84,7 +100,48 @@ public class StudentManagementActivity extends AppCompatActivity {
         // handle filter
         getCourse();
         popUpAction();
+
+
+        //read and write file
+//        requestPermission();
+        if(checkPermission()){
+            Toast.makeText(StudentManagementActivity.this, "permision allowed", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(StudentManagementActivity.this, "permision not allowed", Toast.LENGTH_SHORT).show();
+            requestPermission();
+        }
+
+
+
+
+
+//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+//            if(!Environment.isExternalStorageManager()){
+//                try {
+//                    Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+//                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
+//                    intent.addCategory("android.intent.category.DEFAULT");
+//                    intent.setData(Uri.parse(String.format("package:%s", getApplicationContext().getPackageName())));
+//                    startActivity(intent);
+//                } catch (Exception ex){
+//                    Intent intent = new Intent();
+//                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+//                    startActivity(intent);
+//                }
+//            }
+//        } else {
+//            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+//            }
+//        }
+
+        ActivityCompat.requestPermissions(StudentManagementActivity.this, new String[]{READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE},111);
+
+
     }
+
+
+
 
 
     private void popUpAction() {
@@ -256,7 +313,9 @@ public class StudentManagementActivity extends AppCompatActivity {
         } else if (item.getItemId() == R.id.myImport) {
             Toast.makeText(this, "Import", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.myExport) {
-            Toast.makeText(this, "Export", Toast.LENGTH_SHORT).show();
+            MyCSVWriter myCSVWriter = new MyCSVWriter(this);
+            myCSVWriter.exportDataToCSV();
+            Toast.makeText(this, "Export nè", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -264,4 +323,18 @@ public class StudentManagementActivity extends AppCompatActivity {
         txtSearch = str;
         studentAdapter.search(str.toLowerCase());
     }
+
+    private boolean checkPermission() {
+        if(ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+            return true;
+        }
+        return false;
+    }
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{WRITE_EXTERNAL_STORAGE},
+                111);
+    }
+
+
 }
