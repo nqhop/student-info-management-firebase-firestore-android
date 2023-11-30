@@ -290,6 +290,8 @@ public class StudentManagementActivity extends AppCompatActivity {
             MyCSVWriter myCSVWriter = new MyCSVWriter(this);
             myCSVWriter.exportDataToCSV(studentAdapter.getStudents());
             Toast.makeText(this, "Exported", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.loginHistory) {
+            startActivity(new Intent(this, HistoryActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

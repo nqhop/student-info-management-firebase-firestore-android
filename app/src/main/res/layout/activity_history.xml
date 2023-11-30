@@ -6,4 +6,9 @@
 
     <!-- Giao diện hiển thị lịch sử đăng nhập ở đây -->
 
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="lịch sử đăng nhập" />
 </RelativeLayout>
