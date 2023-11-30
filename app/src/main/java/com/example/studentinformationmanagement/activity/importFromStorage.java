@@ -125,10 +125,7 @@ public class importFromStorage extends AppCompatActivity {
                 while ((nextLine = reader.readNext()) != null) {
                     Certificate certificate= new Certificate(nextLine[0], nextLine[1], nextLine[2], nextLine[3]);
                     Log.d("importCertificate","certificate " + certificate.getTitle());
-                    collectionReference.add(certificate).addOnFailureListener(d -> {
-                        Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
-                        finish();
-                    });
+
                 }
                 startActivity(new Intent(this, StudentManagementActivity.class));
                 Toast.makeText(this, "Successful", Toast.LENGTH_SHORT).show();
