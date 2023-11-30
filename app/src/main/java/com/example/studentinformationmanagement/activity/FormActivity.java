@@ -79,6 +79,11 @@ public class FormActivity extends AppCompatActivity implements CertificateDialog
         });
 
         activityFormBinding.updateButton.setOnClickListener(v -> {
+            if(!formStudent.isValid()) {
+                AddWarningDialog.showAddDialog(this, "Item Name", (dialog, which) -> {
+                });
+                return;
+            }
             updateStudent();
         });
 
