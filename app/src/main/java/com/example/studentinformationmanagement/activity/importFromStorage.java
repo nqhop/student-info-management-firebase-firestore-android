@@ -97,10 +97,43 @@ public class importFromStorage extends AppCompatActivity {
             l.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    importStudent(position);
+                    if(studentsID.isEmpty()){
+                        importStudent(position);
+                    }else{
+                        importCertificate(position);
+                    }
+
                     Toast.makeText(importFromStorage.this, fileName.get(position), Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+    }
+
+    private void importCertificate(int position) {
+        File file = new File(filePath.get(position));
+        Log.d("importCertificate", filePath.get(position));
+
+        if (file.isFile() && file.getName().endsWith(".csv")) {
+            // CSV file found, process it with OpenCSV
+
+//            "id","title","description","date"
+
+//            (String id, String title, String description, String date)
+
+            try (CSVReader reader = new CSVReader(new FileReader(file))) {
+                String[] nextLine;
+                while ((nextLine = reader.readNext()) != null) {
+                    Certificate certificate= new Certificate(nextLine[0], nextLine[1], nextLine[2], nextLine[3]);
+                    Log.d("importCertificate","certificate " + certificate.getTitle());
+                    collectionReference.add(certificate).addOnFailureListener(d -> {
+                        Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                }
+                startActivity(new Intent(this, StudentManagementActivity.class));
+                Toast.makeText(this, "Successful", Toast.LENGTH_SHORT).show();
+            } catch (IOException | CsvValidationException e) {
+            }
         }
     }
 
@@ -132,8 +165,8 @@ public class importFromStorage extends AppCompatActivity {
                         finish();
                     });
                 }
+                startActivity(new Intent(this, StudentManagementActivity.class));
                 Toast.makeText(this, "Successful", Toast.LENGTH_SHORT).show();
-                finish();
             } catch (IOException | CsvValidationException e) {
             }
         }

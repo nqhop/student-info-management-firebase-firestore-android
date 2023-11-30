@@ -300,9 +300,10 @@ public class StudentManagementActivity extends AppCompatActivity {
 
 
     private void requestStoragePermission() {
+        Log.d("Permission","requestStoragePermission");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            Log.d("Permission","requestStoragePermission");
+            Log.d("Permission","request");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},
                     REQUEST_CODE_STORAGE_PERMISSION);
