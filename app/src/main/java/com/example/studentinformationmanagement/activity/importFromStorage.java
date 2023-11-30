@@ -1,5 +1,6 @@
 package com.example.studentinformationmanagement.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -17,8 +18,16 @@ import com.example.studentinformationmanagement.R;
 import com.example.studentinformationmanagement.model.Certificate;
 import com.example.studentinformationmanagement.model.Student;
 import com.example.studentinformationmanagement.storage.MyCSVWriter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -38,6 +47,8 @@ public class importFromStorage extends AppCompatActivity {
     List<String> filePath;
     ListView l;
     TextView title;
+    String path;
+    String studentsID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +60,7 @@ public class importFromStorage extends AppCompatActivity {
         fileName = new ArrayList<>();
         filePath = new ArrayList<>();
         Intent intent = getIntent();
-        String studentsID = intent.getStringExtra("studentsID");
+        studentsID = intent.getStringExtra("studentsID");
         Log.d("importFromStorage", "addListStudent " + studentsID);
 
         assert studentsID != null;
@@ -71,20 +82,6 @@ public class importFromStorage extends AppCompatActivity {
                 Log.d("importFromStorage", "file path " + file.getPath());
                 fileName.add(file.getName());
                 filePath.add(file.getPath());
-
-                if (file.isFile() && file.getName().endsWith(".csv")) {
-                    // CSV file found, process it with OpenCSV
-                    String fileName = file.getName();
-                    String filePath = file.getAbsolutePath();
-
-                    try (CSVReader reader = new CSVReader(new FileReader(file))) {
-                        String[] nextLine;
-                        while ((nextLine = reader.readNext()) != null) {
-                            Log.d("importFromStorage", Arrays.toString(nextLine));
-                        }
-                    } catch (IOException | CsvValidationException e) {
-                    }
-                }
             }
 
             ArrayAdapter<String> arr;
@@ -102,7 +99,6 @@ public class importFromStorage extends AppCompatActivity {
                     }else{
                         importCertificate(position);
                     }
-
                     Toast.makeText(importFromStorage.this, fileName.get(position), Toast.LENGTH_SHORT).show();
                 }
             });
@@ -122,9 +118,43 @@ public class importFromStorage extends AppCompatActivity {
 
             try (CSVReader reader = new CSVReader(new FileReader(file))) {
                 String[] nextLine;
+                boolean isFirstLine = true;
                 while ((nextLine = reader.readNext()) != null) {
+                    if (isFirstLine) {
+                        isFirstLine = false;
+                        continue;
+                    }
                     Certificate certificate= new Certificate(nextLine[0], nextLine[1], nextLine[2], nextLine[3]);
                     Log.d("importCertificate","certificate " + certificate.getTitle());
+
+                    collectionReference.whereEqualTo("id", studentsID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (DocumentSnapshot document : task.getResult()) {
+                                    path = document.getReference().getPath();
+                                    path = path.substring(path.indexOf("/") + 1);
+                                    Log.d("importCertificate", "Path " + path);
+                                    DocumentReference docRef = collectionReference.document(path);
+                                    docRef.update("certificateList", FieldValue.arrayUnion(certificate))
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                // Data added successfully
+                                                Log.d("Firestore", "Data added to the array field");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                // Handle the error condition
+                                                Log.w("Firestore", "Error adding data to the array field", e);
+                                            }
+                                        });
+                                }
+                            }
+                        }
+                    });
 
                 }
                 startActivity(new Intent(this, StudentManagementActivity.class));

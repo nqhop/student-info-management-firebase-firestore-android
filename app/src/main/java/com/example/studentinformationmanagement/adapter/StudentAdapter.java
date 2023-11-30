@@ -13,6 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.studentinformationmanagement.R;
 import com.example.studentinformationmanagement.activity.FormActivity;
 import com.example.studentinformationmanagement.model.Student;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +35,10 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
     private Set<Integer> studentVisitable = new HashSet<>();
     private List<Integer> studentHiden = new ArrayList<>();
     private Set<Integer> studentVisitableFilter;
+    private String path;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference collectionReference = db.collection("Students");
 
     public Set<Integer> getStudentVisitable(List<String> studentIDs) {
         Set<Integer> sVisitable = new HashSet<>();
@@ -185,8 +195,24 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.StudentH
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(v.getContext(), FormActivity.class);
-                    i.putExtra("id", "G3t1hM8oUiHAXSo8d5px");
-                    v.getContext().startActivity(i);
+
+
+                    collectionReference.whereEqualTo("id", students.get(getPosition()).getId())
+                        .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (DocumentSnapshot document : task.getResult()) {
+                                        path = document.getReference().getPath();
+                                        path = path.substring(path.indexOf("/") + 1);
+
+                                        i.putExtra("id", path);
+                                        v.getContext().startActivity(i);
+                                        break;
+                                    }
+                                }
+                            }
+                        });
                 }
             });
         }
